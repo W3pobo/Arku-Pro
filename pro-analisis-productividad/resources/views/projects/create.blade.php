@@ -3,57 +3,110 @@
 @section('title', 'Crear Nuevo Proyecto')
 
 @section('content')
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header"><h1>Crear Nuevo Proyecto</h1></div>
+<div class="container mx-auto px-4 py-8">
+    <div class="max-w-2xl mx-auto">
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h1 class="text-2xl font-bold text-gray-800 mb-6">Crear Nuevo Proyecto</h1>
 
-                <div class="card-body">
-                    {{-- ========================================================= --}}
-                    {{-- ESTE ES EL BLOQUE QUE NECESITAS AÑADIR/ASEGURAR QUE EXISTA --}}
-                    {{-- ========================================================= --}}
-                    @if ($errors->any())
-                        <div class="alert alert-danger">
-                            <strong>¡Ups! Hubo algunos problemas con tu entrada.</strong>
-                            <ul>
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    @endif
-                    {{-- ========================================================= --}}
+            <form action="{{ route('projects.store') }}" method="POST">
+                @csrf
 
-                    <form action="{{ route('projects.store') }}" method="POST">
-                        @csrf
-
-                        <div class="mb-3">
-                            <label for="name" class="form-label">Nombre del Proyecto</label>
-                            <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name') }}" required>
-                            @error('name')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="description" class="form-label">Descripción</label>
-                            <textarea class="form-control" id="description" name="description" rows="3">{{ old('description') }}</textarea>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="status" class="form-label">Estado</label>
-                            <select class="form-select" id="status" name="status">
-                                <option value="active" {{ old('status', 'active') == 'active' ? 'selected' : '' }}>Activo</option>
-                                <option value="paused" {{ old('status') == 'paused' ? 'selected' : '' }}>Pausado</option>
-                                <option value="completed" {{ old('status') == 'completed' ? 'selected' : '' }}>Completado</option>
-                            </select>
-                        </div>
-
-                        <button type="submit" class="btn btn-primary">Guardar Proyecto</button>
-                    </form>
+                <!-- Nombre del Proyecto -->
+                <div class="mb-6">
+                    <label for="name" class="block text-sm font-medium text-gray-700 mb-2">
+                        Nombre del Proyecto *
+                    </label>
+                    <input type="text" name="name" id="name" required
+                           value="{{ old('name') }}"
+                           class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                           placeholder="Ingresa el nombre del proyecto">
+                    @error('name')
+                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                    @enderror
                 </div>
-            </div>
+
+                <!-- Descripción -->
+                <div class="mb-6">
+                    <label for="description" class="block text-sm font-medium text-gray-700 mb-2">
+                        Descripción
+                    </label>
+                    <textarea name="description" id="description" 
+                              rows="3"
+                              class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                              placeholder="Describe el proyecto...">{{ old('description') }}</textarea>
+                    @error('description')
+                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <!-- Estado -->
+                <div class="mb-6">
+                    <label for="status" class="block text-sm font-medium text-gray-700 mb-2">
+                        Estado *
+                    </label>
+                    <select name="status" id="status" required
+                            class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <option value="">Selecciona un estado</option>
+                        <option value="active" {{ old('status') == 'active' ? 'selected' : '' }}>Activo</option>
+                        <option value="completed" {{ old('status') == 'completed' ? 'selected' : '' }}>Completado</option>
+                        <option value="paused" {{ old('status') == 'paused' ? 'selected' : '' }}>Pausado</option>
+                    </select>
+                    @error('status')
+                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <!-- Fecha de Inicio -->
+                <div class="mb-6">
+                    <label for="start_date" class="block text-sm font-medium text-gray-700 mb-2">
+                        Fecha de Inicio
+                    </label>
+                    <input type="date" name="start_date" id="start_date"
+                           value="{{ old('start_date') }}"
+                           class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    @error('start_date')
+                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <!-- Fecha Límite -->
+                <div class="mb-6">
+                    <label for="deadline" class="block text-sm font-medium text-gray-700 mb-2">
+                        Fecha Límite
+                    </label>
+                    <input type="date" name="deadline" id="deadline"
+                           value="{{ old('deadline') }}"
+                           class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    @error('deadline')
+                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <!-- Color -->
+                <div class="mb-6">
+                    <label for="color" class="block text-sm font-medium text-gray-700 mb-2">
+                        Color del Proyecto
+                    </label>
+                    <input type="color" name="color" id="color"
+                           value="{{ old('color', '#3b82f6') }}"
+                           class="w-full h-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    @error('color')
+                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <!-- Botones -->
+                <div class="flex justify-end space-x-4">
+                    <a href="{{ route('projects.index') }}" 
+                       class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition duration-200">
+                        Cancelar
+                    </a>
+                    <button type="submit" 
+                            class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 transition duration-200">
+                        Crear Proyecto
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </div>

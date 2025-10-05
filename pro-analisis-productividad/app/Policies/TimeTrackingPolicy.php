@@ -6,7 +6,7 @@ use App\Models\TimeTracking;
 use App\Models\User;
 use Illuminate\Auth\Access\Response;
 
-class ProjectPolicy
+class TimeTrackingPolicy
 {
     public function view(User $user, TimeTracking $timeTracking)
     {

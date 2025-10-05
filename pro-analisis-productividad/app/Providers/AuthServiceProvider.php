@@ -2,10 +2,12 @@
 
 namespace App\Providers;
 
-use App\Models\Project;
-use App\Policies\ProjectPolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Gate;
+use App\Models\TimeTracking;
+use App\Models\Project;
+use App\Policies\TimeTrackingPolicy;
+use App\Policies\ProjectPolicy;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -15,6 +17,7 @@ class AuthServiceProvider extends ServiceProvider
      * @var array<class-string, class-string>
      */
     protected $policies = [
+        TimeTracking::class => TimeTrackingPolicy::class,
         Project::class => ProjectPolicy::class,
     ];
 

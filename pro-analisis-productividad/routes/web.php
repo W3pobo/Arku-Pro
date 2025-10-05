@@ -66,3 +66,15 @@ Route::middleware('auth')->group(function () {
 Route::fallback(function () {
     return redirect()->route('home');
 });
+
+Route::resource('activity-categories', ActivityCategoryController::class)->middleware('auth');
+Route::resource('productivity-tags', ProductivityTagController::class)->middleware('auth');
+
+Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+
+// Rutas de perfil (AGREGA ESTAS LÍNEAS)
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [App\Http\Controllers\ProfileController::class, 'show'])->name('profile.show');
+    Route::get('/profile/edit', [App\Http\Controllers\ProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('/profile/update', [App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
+});

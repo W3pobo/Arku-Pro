@@ -8,13 +8,14 @@ use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {
-    /**
-     * Seed the application's database.
-     */
     public function run(): void
     {
-        // User::factory(10)->create();
+        $this->call([
+            ActivityCategoriesSeeder::class,
+            // Puedes agregar más seeders aquí
+        ]);
 
+        // Crear usuario de prueba (fuera del array call)
         User::factory()->create([
             'name' => 'Test User',
             'email' => 'test@example.com',

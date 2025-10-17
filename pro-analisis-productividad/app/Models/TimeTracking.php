@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class TimeTracking extends Model
 {
@@ -31,23 +33,23 @@ class TimeTracking extends Model
         'is_productive' => 'boolean'
     ];
 
-    // Relaciones
-    public function user()
+    // Relaciones con tipos de retorno explícitos
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    public function project()
+    public function project(): BelongsTo
     {
         return $this->belongsTo(Project::class);
     }
 
-    public function activityCategory()
+    public function activityCategory(): BelongsTo
     {
         return $this->belongsTo(ActivityCategory::class);
     }
 
-    public function productivityTags()
+    public function productivityTags(): BelongsToMany
     {
         return $this->belongsToMany(ProductivityTag::class, 'time_tracking_productivity_tag')
                     ->withTimestamps();
@@ -151,5 +153,19 @@ class TimeTracking extends Model
     public function getActivityCategoryColorAttribute()
     {
         return $this->activityCategory ? $this->activityCategory->color : '#6b7280';
+    }
+
+    /**
+     * Boot method para calcular automáticamente la duración
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::saving(function ($model) {
+            if ($model->start_time && $model->end_time) {
+                $model->duration_minutes = $model->start_time->diffInMinutes($model->end_time);
+            }
+        });
     }
 }

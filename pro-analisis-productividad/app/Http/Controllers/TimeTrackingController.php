@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\TimeTracking;
 use App\Models\Project;
 use App\Models\ActivityCategory;
-use App\Models\ProductivityTag;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -13,7 +12,11 @@ class TimeTrackingController extends Controller
 {
     public function index()
     {
-        $timeTrackings = Auth::user()->timeTrackings()->with('project')->latest()->get();
+        $timeTrackings = Auth::user()->timeTrackings()
+            ->with(['project', 'activityCategory'])
+            ->latest()
+            ->get();
+            
         return view('time-trackings.index', compact('timeTrackings'));
     }
 
@@ -27,16 +30,7 @@ class TimeTrackingController extends Controller
                   ->orWhere('is_system', true);
         })->get();
 
-        // Definir tipos de etiquetas de productividad
-        $tagTypes = [
-            'focus' => 'Enfoque y Concentración',
-            'energy' => 'Energía y Estado',
-            'environment' => 'Entorno de Trabajo',
-            'mood' => 'Estado de Ánimo',
-            'distraction' => 'Distracciones',
-        ];
-
-        return view('time-trackings.create', compact('projects', 'categories', 'tagTypes'));
+        return view('time-trackings.create', compact('projects', 'categories'));
     }
 
     public function store(Request $request)
@@ -50,48 +44,47 @@ class TimeTrackingController extends Controller
             'focus_level' => 'nullable|integer|min:0|max:100',
             'energy_level' => 'nullable|integer|min:0|max:100',
             'notes' => 'nullable|string|max:1000',
-            'productivity_tags' => 'nullable|array',
-            'productivity_tags.*' => 'exists:productivity_tags,id'
         ]);
 
-        // Calcular duración en minutos
-        $start = new \DateTime($validated['start_time']);
-        $end = new \DateTime($validated['end_time']);
-        $duration = $start->diff($end)->h * 60 + $start->diff($end)->i;
+        try {
+            // Calcular duración en minutos
+            $start = new \DateTime($validated['start_time']);
+            $end = new \DateTime($validated['end_time']);
+            $duration = $start->diff($end)->h * 60 + $start->diff($end)->i;
 
-        // Crear el registro de tiempo
-        $timeTracking = TimeTracking::create([
-            'user_id' => Auth::id(),
-            'project_id' => $validated['project_id'],
-            'activity_category_id' => $validated['activity_category_id'],
-            'start_time' => $validated['start_time'],
-            'end_time' => $validated['end_time'],
-            'duration_minutes' => $duration,
-            'description' => $validated['description'],
-            'focus_level' => $validated['focus_level'] ?? 50,
-            'energy_level' => $validated['energy_level'] ?? 50,
-            'notes' => $validated['notes'],
-        ]);
+            // Crear el registro de tiempo
+            $timeTracking = TimeTracking::create([
+                'user_id' => Auth::id(),
+                'project_id' => $validated['project_id'],
+                'activity_category_id' => $validated['activity_category_id'],
+                'start_time' => $validated['start_time'],
+                'end_time' => $validated['end_time'],
+                'duration_minutes' => $duration,
+                'description' => $validated['description'],
+                'focus_level' => $validated['focus_level'] ?? 50,
+                'energy_level' => $validated['energy_level'] ?? 50,
+                'notes' => $validated['notes'],
+            ]);
 
-        // Adjuntar etiquetas de productividad si existen
-        if ($request->has('productivity_tags')) {
-            $timeTracking->productivityTags()->attach($validated['productivity_tags']);
+            // Actualizar el total de horas del proyecto si hay proyecto asociado
+            if ($validated['project_id']) {
+                $project = Project::find($validated['project_id']);
+                $project->increment('total_hours', $duration);
+            }
+
+            return redirect()->route('time-trackings.index')
+                ->with('success', 'Registro de tiempo guardado exitosamente.');
+
+        } catch (\Exception $e) {
+            return back()->with('error', 'Error al crear el registro: ' . $e->getMessage())
+                        ->withInput();
         }
-
-        // Actualizar el total de horas del proyecto si hay proyecto asociado
-        if ($validated['project_id']) {
-            $project = Project::find($validated['project_id']);
-            $project->total_hours += $duration;
-            $project->save();
-        }
-
-        return redirect()->route('time-trackings.index')
-            ->with('success', 'Registro de tiempo guardado exitosamente.');
     }
 
     public function show(TimeTracking $timeTracking)
     {
         $this->authorize('view', $timeTracking);
+        $timeTracking->load(['project', 'activityCategory']);
         return view('time-trackings.show', compact('timeTracking'));
     }
 
@@ -106,19 +99,7 @@ class TimeTrackingController extends Controller
                   ->orWhere('is_system', true);
         })->get();
 
-        // Definir tipos de etiquetas de productividad
-        $tagTypes = [
-            'focus' => 'Enfoque y Concentración',
-            'energy' => 'Energía y Estado',
-            'environment' => 'Entorno de Trabajo',
-            'mood' => 'Estado de Ánimo',
-            'distraction' => 'Distracciones',
-        ];
-
-        // Obtener etiquetas seleccionadas
-        $selectedTags = $timeTracking->productivityTags->pluck('id')->toArray();
-
-        return view('time-trackings.edit', compact('timeTracking', 'projects', 'categories', 'tagTypes', 'selectedTags'));
+        return view('time-trackings.edit', compact('timeTracking', 'projects', 'categories'));
     }
 
     public function update(Request $request, TimeTracking $timeTracking)
@@ -134,8 +115,6 @@ class TimeTrackingController extends Controller
             'focus_level' => 'nullable|integer|min:0|max:100',
             'energy_level' => 'nullable|integer|min:0|max:100',
             'notes' => 'nullable|string|max:1000',
-            'productivity_tags' => 'nullable|array',
-            'productivity_tags.*' => 'exists:productivity_tags,id'
         ]);
 
         // Calcular nueva duración
@@ -158,13 +137,6 @@ class TimeTrackingController extends Controller
             'energy_level' => $validated['energy_level'] ?? 50,
             'notes' => $validated['notes'],
         ]);
-
-        // Sincronizar etiquetas de productividad
-        if ($request->has('productivity_tags')) {
-            $timeTracking->productivityTags()->sync($validated['productivity_tags']);
-        } else {
-            $timeTracking->productivityTags()->detach();
-        }
 
         return redirect()->route('time-trackings.index')
             ->with('success', 'Registro de tiempo actualizado exitosamente.');

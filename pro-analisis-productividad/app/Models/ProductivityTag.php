@@ -1,11 +1,9 @@
 <?php
-// app/Models/ProductivityTag.php
 
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class ProductivityTag extends Model
 {
@@ -23,19 +21,22 @@ class ProductivityTag extends Model
 
     protected $casts = [
         'is_system' => 'boolean',
+        'impact_score' => 'integer'
     ];
 
     /**
-     * Relación con time trackings
+     * Obtener etiquetas disponibles para el usuario
      */
-    public function timeTrackings(): BelongsToMany
+    public static function getAvailableTags()
     {
-        return $this->belongsToMany(TimeTracking::class, 'time_tracking_productivity_tags')
-                    ->withTimestamps();
+        return self::where(function($query) {
+            $query->where('user_id', auth()->id())
+                  ->orWhere('is_system', true);
+        })->get();
     }
 
     /**
-     * Relación con usuario
+     * Relación con el usuario
      */
     public function user()
     {
@@ -43,34 +44,11 @@ class ProductivityTag extends Model
     }
 
     /**
-     * Scope para etiquetas del sistema
+     * Relación con time trackings
      */
-    public function scopeSystem($query)
+    public function timeTrackings()
     {
-        return $query->where('is_system', true);
-    }
-
-    /**
-     * Scope por tipo
-     */
-    public function scopeOfType($query, $type)
-    {
-        return $query->where('type', $type);
-    }
-
-    /**
-     * Scope para etiquetas positivas
-     */
-    public function scopePositive($query)
-    {
-        return $query->where('impact_score', '>', 0);
-    }
-
-    /**
-     * Scope para etiquetas negativas
-     */
-    public function scopeNegative($query)
-    {
-        return $query->where('impact_score', '<', 0);
+        return $this->belongsToMany(TimeTracking::class, 'time_tracking_productivity_tags')
+                    ->withTimestamps();
     }
 }

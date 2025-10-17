@@ -3,197 +3,222 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inicio de Sesión</title>
+    <title>Inicio de Sesión - ArkuPro</title>
     <script src="https://cdn.jsdelivr.net/npm/vue@3.2.31/dist/vue.global.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         :root {
-            --primary: #3498db;
-            --secondary: #2c3e50;
-            --success: #2ecc71;
-            --warning: #f39c12;
-            --danger: #e74c3c;
-            --light: #ecf0f1;
-            --dark: #34495e;
-            --gray: #95a5a6;
+            --bg-primary: #121826;
+            --bg-secondary: #2A3241;
+            --accent: #7E57C2;
+            --accent-hover: #9575CD;
+            --text-primary: #F0F2F5;
+            --text-secondary: #A9B4C7;
+            --success: #22c55e;
+            --warning: #eab308;
+            --danger: #ef4444;
+            --border-color: #3a4251;
         }
         
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Nunito', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         
         body {
-            background-color: #f5f7fa;
-            color: #333;
+            background: linear-gradient(135deg, var(--bg-primary) 0%, #1a2233 100%);
+            color: var(--text-primary);
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
+            padding: 20px;
         }
         
         .auth-container {
-            background-color: white;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
             width: 100%;
-            max-width: 400px;
-            padding: 30px;
+            max-width: 450px;
+            padding: 40px;
+            border: 1px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .auth-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent), var(--accent-hover));
         }
         
         .auth-header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 35px;
         }
         
         .auth-logo {
-            font-weight: 700;
-            font-size: 2rem;
-            color: var(--primary);
-            margin-bottom: 10px;
-        }
-        
-        .auth-logo span {
-            color: var(--secondary);
+            font-weight: 800;
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
         
         .auth-title {
-            font-size: 1.5rem;
-            color: var(--dark);
+            font-size: 1.8rem;
+            color: var(--text-primary);
             margin-bottom: 10px;
+            font-weight: 600;
         }
         
         .auth-subtitle {
-            color: var(--gray);
-            font-size: 0.9rem;
+            color: var(--text-secondary);
+            font-size: 1rem;
         }
         
         .auth-form {
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
         
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
         
         .form-group label {
             display: block;
-            margin-bottom: 5px;
-            font-weight: 500;
-            color: var(--dark);
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-primary);
         }
         
         .form-control {
             width: 100%;
-            padding: 12px 15px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+            padding: 15px 20px;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
             font-size: 1rem;
-            transition: border-color 0.3s;
+            transition: all 0.3s ease;
+            background: var(--bg-primary);
+            color: var(--text-primary);
         }
         
         .form-control:focus {
-            border-color: var(--primary);
+            border-color: var(--accent);
             outline: none;
+            box-shadow: 0 0 0 3px rgba(126, 87, 194, 0.2);
+            transform: translateY(-2px);
         }
         
         .form-text {
-            font-size: 0.8rem;
-            color: var(--gray);
-            margin-top: 5px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 6px;
         }
         
         .btn {
-            padding: 12px;
-            border-radius: 4px;
+            padding: 15px;
+            border-radius: 12px;
             border: none;
             cursor: pointer;
-            font-weight: 500;
-            transition: all 0.3s;
+            font-weight: 600;
+            transition: all 0.3s ease;
             width: 100%;
             font-size: 1rem;
-        }
-        
-        .btn-primary {
-            background-color: var(--primary);
-            color: white;
-        }
-        
-        .btn-primary:hover {
-            background-color: #2980b9;
-        }
-        
-        .btn-google {
-            background-color: white;
-            color: #757575;
-            border: 1px solid #ddd;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 15px;
+            gap: 10px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+            color: var(--text-primary);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(126, 87, 194, 0.4);
+        }
+        
+        .btn-google {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            margin-bottom: 20px;
         }
         
         .btn-google:hover {
-            background-color: #f5f5f5;
-        }
-        
-        .btn-google img {
-            width: 20px;
-            margin-right: 10px;
+            background: var(--border-color);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
         }
         
         .auth-divider {
             display: flex;
             align-items: center;
-            margin: 20px 0;
+            margin: 25px 0;
+            color: var(--text-secondary);
         }
         
         .auth-divider::before,
         .auth-divider::after {
             content: "";
             flex: 1;
-            border-bottom: 1px solid #ddd;
+            border-bottom: 1px solid var(--border-color);
         }
         
         .auth-divider span {
-            padding: 0 10px;
-            color: var(--gray);
+            padding: 0 15px;
             font-size: 0.9rem;
         }
         
         .auth-footer {
             text-align: center;
-            margin-top: 20px;
+            margin-top: 25px;
         }
         
         .auth-footer a {
-            color: var(--primary);
+            color: var(--accent);
             text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
         }
         
         .auth-footer a:hover {
+            color: var(--accent-hover);
             text-decoration: underline;
         }
         
         .alert {
-            padding: 12px 15px;
-            border-radius: 4px;
-            margin-bottom: 20px;
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
             font-size: 0.9rem;
+            border: none;
+            backdrop-filter: blur(10px);
         }
         
         .alert-danger {
-            background-color: rgba(231, 76, 60, 0.1);
-            color: var(--danger);
-            border: 1px solid rgba(231, 76, 60, 0.2);
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
         }
         
         .alert-success {
-            background-color: rgba(46, 204, 113, 0.1);
-            color: var(--success);
-            border: 1px solid rgba(46, 204, 113, 0.2);
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+            border: 1px solid rgba(34, 197, 94, 0.3);
         }
         
         .password-toggle {
@@ -201,18 +226,52 @@
         }
         
         .password-toggle .form-control {
-            padding-right: 40px;
+            padding-right: 50px;
         }
         
         .toggle-password {
             position: absolute;
-            right: 10px;
+            right: 15px;
             top: 50%;
             transform: translateY(-50%);
             background: none;
             border: none;
             cursor: pointer;
-            color: var(--gray);
+            color: var(--text-secondary);
+            transition: all 0.3s ease;
+            padding: 5px;
+            border-radius: 6px;
+        }
+        
+        .toggle-password:hover {
+            color: var(--accent);
+            background: rgba(126, 87, 194, 0.1);
+        }
+        
+        .form-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            font-size: 0.9rem;
+        }
+        
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-secondary);
+        }
+        
+        .forgot-password {
+            color: var(--accent);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .forgot-password:hover {
+            color: var(--accent-hover);
+            text-decoration: underline;
         }
     </style>
 </head>
@@ -220,11 +279,9 @@
     <div id="app">
         <div class="auth-container">
             <div class="auth-header">
-                <div class="auth-logo">Arku<span>Pro</span></div>
-                <h1 class="auth-title" v-if="isLoginMode">Iniciar Sesión</h1>
-                <h1 class="auth-title" v-else>Crear Cuenta</h1>
-                <p class="auth-subtitle" v-if="isLoginMode">Ingresa a tu dashboard de productividad</p>
-                <p class="auth-subtitle" v-else>Checando que tan productivo eres</p>
+                <div class="auth-logo">ArkuPro</div>
+                <h1 class="auth-title">Iniciar Sesión</h1>
+                <p class="auth-subtitle">Ingresa a tu dashboard de productividad</p>
             </div>
 
             @if ($errors->any())
@@ -247,59 +304,61 @@
                 @{{ errorMessage }}
             </div>
 
-            <div class="alert alert-success" v-if="successMessage">
-                @{{ successMessage }}
-            </div>
-
             <a href="{{ route('google.login') }}" class="btn btn-google">
-                <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgiIGhlaWdodD0iMTgiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj48cGF0aCBkPSJNMTcuNiA5LjJsLS4xLTEuOEg5djMuNGg0LjhDMTMuNiAxMiAxMyAxMyAxMiAxMy42djIuMmgzYTguOCA4LjggMCAwIDAgMi42LTYuNnoiIGZpbGw9IiM0Mjg1RjQiIGZpbGwtcnVsZT0ibm9uemVybyIvPjxwYXRoIGQ9Ik05IDE4YzIuNCAwIDQuNS0uOCA2LTIuMmwtMy0yLjJhNS40IDUuNCAwIDAgMS04LTIuOUgxVjEzYTkgOSAwIDAgMCA4IDV6IiBmaWxsPSIjMzRBODUzIiBmaWxsLXJ1bGU9Im5vbnplcm8iLz48cGF0aCBkPSJNNCAxMC43YTUuNCA1LjQgMCAwIDEgMC0zLjRWNUgxYTkgOSAwIDAgMCAwIDhsMy0yLjN6IiBmaWxsPSIjRkJCQzA1IiBmaWxsLXJ1bGU9Im5vbnplcm8iLz48cGF0aCBkPSJNOSAzLjZjMS4zIDAgMi41LjQgMy40IDEuM0wxNSAyLjNBOSA5IDAgMCAwIDEgNWwzIDIuNGE1LjQgNS40IDAgMCAxIDUtMy43eiIgZmlsbD0iI0VBNDMzNSIgZmlsbC1ydWxlPSJub256ZXJvIi8+PHBhdGggZD0iTTAgMGgxOHYxOEgweiIvPjwvZz48L3N2Zz4=" alt="Google">
-                @{{ isLoginMode ? 'Iniciar sesión con Google' : 'Registrarse con Google' }}
+                <i class="fab fa-google"></i>
+                Iniciar sesión con Google
             </a>
 
             <div class="auth-divider">
-                <span>O</span>
+                <span>O continúa con email</span>
             </div>
 
             <form class="auth-form" method="POST" action="{{ route('login') }}">
                 @csrf
-                <div class="form-group" v-if="!isLoginMode">
-                    <label for="name">Nombre completo</label>
-                    <input type="text" class="form-control" id="name" v-model="form.name" required>
+                
+                <div class="form-group">
+                    <label for="email">
+                        <i class="fas fa-envelope me-2"></i>Correo electrónico
+                    </label>
+                    <input type="email" class="form-control" id="email" name="email" value="{{ old('email') }}" required 
+                           placeholder="tu@email.com">
                 </div>
                 
                 <div class="form-group">
-                    <label for="email">Correo electrónico</label>
-                    <input type="email" class="form-control" id="email" name="email" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="password">Contraseña</label>
+                    <label for="password">
+                        <i class="fas fa-lock me-2"></i>Contraseña
+                    </label>
                     <div class="password-toggle">
-                        <input :type="showPassword ? 'text' : 'password'" class="form-control" id="password" name="password" required>
+                        <input :type="showPassword ? 'text' : 'password'" class="form-control" id="password" name="password" required 
+                               placeholder="••••••••">
                         <button type="button" class="toggle-password" @click="showPassword = !showPassword">
-                            <span v-if="showPassword">👁️</span>
-                            <span v-else>👁️</span>
+                            <i :class="showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
                         </button>
                     </div>
-                    <p class="form-text" v-if="!isLoginMode">La contraseña debe tener al menos 8 caracteres</p>
                 </div>
-                
-                <div class="form-group" v-if="!isLoginMode">
-                    <label for="password_confirmation">Confirmar contraseña</label>
-                    <input type="password" class="form-control" id="password_confirmation" v-model="form.password_confirmation" required>
+
+                <div class="form-options">
+                    <label class="remember-me">
+                        <input type="checkbox" name="remember" {{ old('remember') ? 'checked' : '' }}>
+                        Recordarme
+                    </label>
+                    @if (Route::has('password.request'))
+                        <a href="{{ route('password.request') }}" class="forgot-password">
+                            ¿Olvidaste tu contraseña?
+                        </a>
+                    @endif
                 </div>
                 
                 <button type="submit" class="btn btn-primary">
-                    @{{ isLoginMode ? 'Iniciar Sesión' : 'Crear Cuenta' }}
+                    <i class="fas fa-sign-in-alt"></i>
+                    Iniciar Sesión
                 </button>
             </form>
             
             <div class="auth-footer">
-                <p v-if="isLoginMode">
-                    ¿No tienes una cuenta? <a href="#" @click="toggleMode">Regístrate</a>
-                </p>
-                <p v-else>
-                    ¿Ya tienes una cuenta? <a href="#" @click="toggleMode">Inicia sesión</a>
+                <p>
+                    ¿No tienes una cuenta? 
+                    <a href="{{ route('register') }}">Regístrate ahora</a>
                 </p>
             </div>
         </div>
@@ -310,127 +369,50 @@
         
         createApp({
             setup() {
-                const isLoginMode = ref(true);
                 const showPassword = ref(false);
                 const errorMessage = ref('');
                 const successMessage = ref('');
                 
-                const form = ref({
-                    name: '',
-                    email: '',
-                    password: '',
-                    password_confirmation: ''
-                });
-                
-                const toggleMode = () => {
-                    isLoginMode.value = !isLoginMode.value;
-                    errorMessage.value = '';
-                    successMessage.value = '';
-                };
-                
-                const validateForm = () => {
-                    if (!isLoginMode.value) {
-                        // Validación de registro
-                        if (form.value.name.length < 3) {
-                            errorMessage.value = 'El nombre debe tener al menos 3 caracteres';
-                            return false;
-                        }
-                        
-                        if (form.value.password.length < 8) {
-                            errorMessage.value = 'La contraseña debe tener al menos 8 caracteres';
-                            return false;
-                        }
-                        
-                        if (form.value.password !== form.value.password_confirmation) {
-                            errorMessage.value = 'Las contraseñas no coinciden';
-                            return false;
-                        }
-                    }
-                    
-                    // Validación de email
-                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                    if (!emailRegex.test(form.value.email)) {
-                        errorMessage.value = 'Por favor ingresa un correo electrónico válido';
-                        return false;
-                    }
-                    
-                    return true;
-                };
-                
-                const submitForm = () => {
-                    errorMessage.value = '';
-                    
-                    if (!validateForm()) {
-                        return;
-                    }
-                    
-                    // En una aplicación real, aquí harías una petición a tu API de Laravel
-                    if (isLoginMode.value) {
-                        // Redirigir al endpoint de login de Laravel
-                        window.location.href = '/login';
-                    } else {
-                        // Redirigir al endpoint de registro de Laravel
-                        window.location.href = '/register';
-                    }
-                };
-                
                 return {
-                    isLoginMode,
                     showPassword,
-                    form,
                     errorMessage,
-                    successMessage,
-                    toggleMode,
-                    submitForm
+                    successMessage
                 };
             }
         }).mount('#app');
     </script>
 
-    {{-- Tu script de Vue.js existente va aquí arriba --}}
-    
-    {{-- AGREGA ESTE NUEVO SCRIPT AQUÍ ABAJO --}}
     <script>
-        // Espera a que todo el contenido de la página se cargue
         document.addEventListener('DOMContentLoaded', () => {
-            // Busca el contenedor de errores de Laravel
             const errorContainer = document.querySelector('.alert-danger ul');
             if (!errorContainer) return;
 
-            // Busca específicamente el mensaje de error de "throttle"
             const throttleErrorListItem = Array.from(errorContainer.querySelectorAll('li'))
                 .find(li => li.textContent.includes('Demasiados intentos de acceso'));
 
             if (throttleErrorListItem) {
                 const originalText = throttleErrorListItem.textContent;
-                
-                // Usa una expresión regular para encontrar el número de segundos
                 const matches = originalText.match(/\d+/);
 
                 if (matches) {
                     let seconds = parseInt(matches[0], 10);
-                    
-                    // Crea un elemento <span> para mostrar el contador
                     const timerSpan = document.createElement('span');
                     timerSpan.id = 'throttle-timer';
                     timerSpan.style.fontWeight = 'bold';
+                    timerSpan.style.color = 'var(--accent)';
                     timerSpan.textContent = seconds;
 
-                    // Reemplaza el número estático con nuestro contador dinámico
                     throttleErrorListItem.innerHTML = originalText.replace(/\d+/, timerSpan.outerHTML);
                     
                     const timer = setInterval(() => {
                         seconds--;
-                        // Actualiza el número en el <span>
                         document.getElementById('throttle-timer').textContent = seconds;
 
-                        // Cuando el contador llega a 0, detén el intervalo
                         if (seconds <= 0) {
                             clearInterval(timer);
-                            // Opcional: Cambia el mensaje cuando el tiempo termina
                             throttleErrorListItem.innerHTML = "Puedes intentar iniciar sesión de nuevo.";
                         }
-                    }, 1000); // Se ejecuta cada 1000 milisegundos (1 segundo)
+                    }, 1000);
                 }
             }
         });

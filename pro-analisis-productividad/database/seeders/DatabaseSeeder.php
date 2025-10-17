@@ -12,10 +12,10 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             ActivityCategoriesSeeder::class,
-            // Puedes agregar más seeders aquí
+            
         ]);
 
-        // Crear usuario de prueba (fuera del array call)
+    
         User::factory()->create([
             'name' => 'Test User',
             'email' => 'test@example.com',

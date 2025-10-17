@@ -5,104 +5,108 @@
 @section('content')
 <div class="container mx-auto px-4 py-8">
     <div class="max-w-2xl mx-auto">
-        <div class="bg-white rounded-lg shadow-md p-6">
-            <h1 class="text-2xl font-bold text-gray-800 mb-6">Crear Nuevo Proyecto</h1>
+        <div class="card-custom">
+            <h1 class="text-2xl font-bold text-main mb-6">Crear Nuevo Proyecto</h1>
 
             <form action="{{ route('projects.store') }}" method="POST">
                 @csrf
 
                 <!-- Nombre del Proyecto -->
                 <div class="mb-6">
-                    <label for="name" class="block text-sm font-medium text-gray-700 mb-2">
+                    <label for="name" class="block text-sm font-medium text-main mb-2">
                         Nombre del Proyecto *
                     </label>
                     <input type="text" name="name" id="name" required
                            value="{{ old('name') }}"
-                           class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                           class="input-custom"
                            placeholder="Ingresa el nombre del proyecto">
                     @error('name')
-                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        <p class="text-red-400 text-sm mt-1">{{ $message }}</p>
                     @enderror
                 </div>
 
                 <!-- Descripción -->
                 <div class="mb-6">
-                    <label for="description" class="block text-sm font-medium text-gray-700 mb-2">
+                    <label for="description" class="block text-sm font-medium text-main mb-2">
                         Descripción
                     </label>
                     <textarea name="description" id="description" 
                               rows="3"
-                              class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                              class="input-custom"
                               placeholder="Describe el proyecto...">{{ old('description') }}</textarea>
                     @error('description')
-                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        <p class="text-red-400 text-sm mt-1">{{ $message }}</p>
                     @enderror
                 </div>
 
                 <!-- Estado -->
                 <div class="mb-6">
-                    <label for="status" class="block text-sm font-medium text-gray-700 mb-2">
+                    <label for="status" class="block text-sm font-medium text-main mb-2">
                         Estado *
                     </label>
-                    <select name="status" id="status" required
-                            class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    <select name="status" id="status" required class="input-custom">
                         <option value="">Selecciona un estado</option>
                         <option value="active" {{ old('status') == 'active' ? 'selected' : '' }}>Activo</option>
                         <option value="completed" {{ old('status') == 'completed' ? 'selected' : '' }}>Completado</option>
                         <option value="paused" {{ old('status') == 'paused' ? 'selected' : '' }}>Pausado</option>
                     </select>
                     @error('status')
-                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        <p class="text-red-400 text-sm mt-1">{{ $message }}</p>
                     @enderror
                 </div>
 
                 <!-- Fecha de Inicio -->
                 <div class="mb-6">
-                    <label for="start_date" class="block text-sm font-medium text-gray-700 mb-2">
+                    <label for="start_date" class="block text-sm font-medium text-main mb-2">
                         Fecha de Inicio
                     </label>
                     <input type="date" name="start_date" id="start_date"
                            value="{{ old('start_date') }}"
-                           class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                           class="input-custom">
                     @error('start_date')
-                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        <p class="text-red-400 text-sm mt-1">{{ $message }}</p>
                     @enderror
                 </div>
 
                 <!-- Fecha Límite -->
                 <div class="mb-6">
-                    <label for="deadline" class="block text-sm font-medium text-gray-700 mb-2">
+                    <label for="deadline" class="block text-sm font-medium text-main mb-2">
                         Fecha Límite
                     </label>
                     <input type="date" name="deadline" id="deadline"
                            value="{{ old('deadline') }}"
-                           class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                           class="input-custom">
                     @error('deadline')
-                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        <p class="text-red-400 text-sm mt-1">{{ $message }}</p>
                     @enderror
                 </div>
 
                 <!-- Color -->
                 <div class="mb-6">
-                    <label for="color" class="block text-sm font-medium text-gray-700 mb-2">
+                    <label for="color" class="block text-sm font-medium text-main mb-2">
                         Color del Proyecto
                     </label>
-                    <input type="color" name="color" id="color"
-                           value="{{ old('color', '#3b82f6') }}"
-                           class="w-full h-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    <div class="flex items-center gap-4">
+                        <input type="color" name="color" id="color"
+                               value="{{ old('color', '#7E57C2') }}"
+                               class="w-16 h-16 border-2 border-gray-600 rounded-lg cursor-pointer bg-secondary">
+                        <span class="text-secondary text-sm">
+                            Haz clic para seleccionar un color
+                        </span>
+                    </div>
                     @error('color')
-                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        <p class="text-red-400 text-sm mt-1">{{ $message }}</p>
                     @enderror
                 </div>
 
                 <!-- Botones -->
-                <div class="flex justify-end space-x-4">
+                <div class="flex justify-end space-x-4 pt-6 border-t border-gray-600">
                     <a href="{{ route('projects.index') }}" 
-                       class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition duration-200">
+                       class="btn-secondary px-6 py-3 rounded-lg transition duration-200 transform hover:-translate-y-1">
                         Cancelar
                     </a>
                     <button type="submit" 
-                            class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 transition duration-200">
+                            class="btn-primary px-6 py-3 rounded-lg transition duration-200 transform hover:-translate-y-1">
                         Crear Proyecto
                     </button>
                 </div>
@@ -110,4 +114,90 @@
         </div>
     </div>
 </div>
+
+<style>
+:root {
+    --bg-main: #121826;
+    --bg-secondary: #2A3241;
+    --accent: #7E57C2;
+    --text-main: #F0F2F5;
+    --text-secondary: #A9B4C7;
+    --hover-accent: #6a4da2;
+    --border-color: #3a4458;
+}
+
+body {
+    background-color: var(--bg-main);
+    color: var(--text-main);
+}
+
+.card-custom {
+    background-color: var(--bg-secondary);
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    border: 1px solid var(--border-color);
+    position: relative;
+    overflow: hidden;
+}
+
+.card-custom::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), transparent);
+}
+
+.input-custom {
+    width: 100%;
+    background-color: var(--bg-main);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    color: var(--text-main);
+    transition: all 0.3s ease;
+}
+
+.input-custom:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(126, 87, 194, 0.2);
+}
+
+.input-custom:hover {
+    border-color: var(--hover-accent);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--accent), var(--hover-accent));
+    color: white;
+    border: none;
+    font-weight: 600;
+    box-shadow: 0 4px 15px rgba(126, 87, 194, 0.3);
+}
+
+.btn-primary:hover {
+    box-shadow: 0 6px 20px rgba(126, 87, 194, 0.4);
+    background: linear-gradient(135deg, var(--hover-accent), var(--accent));
+}
+
+.btn-secondary {
+    background-color: transparent;
+    border: 2px solid var(--text-secondary);
+    color: var(--text-secondary);
+    font-weight: 600;
+}
+
+.btn-secondary:hover {
+    background-color: var(--accent);
+    border-color: var(--accent);
+    color: white;
+}
+
+.text-main { color: var(--text-main); }
+.text-secondary { color: var(--text-secondary); }
+</style>
 @endsection

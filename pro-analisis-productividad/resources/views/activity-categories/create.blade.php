@@ -1,117 +1,121 @@
+
 @extends('layouts.app')
 
 @section('title', 'Nueva Categoría de Actividad')
 
 @section('content')
-<div class="container mx-auto px-4 py-8">
+<div class="container mx-auto px-4 py-8" style="background-color: #121826; min-height: 100vh;">
     <div class="max-w-2xl mx-auto">
-        <div class="bg-white rounded-lg shadow-md p-6">
-            <h1 class="text-2xl font-bold text-gray-800 mb-6">Nueva Categoría de Actividad</h1>
+        <div class="rounded-lg p-6" style="background-color: #2A3241;">
+            <h1 class="text-2xl font-bold mb-6" style="color: #F0F2F5;">Nueva Categoría de Actividad</h1>
 
             <form action="{{ route('activity-categories.store') }}" method="POST">
                 @csrf
 
                 <!-- Nombre -->
                 <div class="mb-6">
-                    <label for="name" class="block text-sm font-medium text-gray-700 mb-2">
+                    <label for="name" class="block text-sm font-medium mb-2" style="color: #F0F2F5;">
                         Nombre de la Categoría *
                     </label>
                     <input type="text" name="name" id="name" required
                            value="{{ old('name') }}"
-                           class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                           class="w-full rounded-lg px-4 py-2 focus:ring-2 transition duration-300"
+                           style="background-color: #121826; border: 1px solid #2A3241; color: #F0F2F5;"
                            placeholder="Ej: Desarrollo, Reuniones, Estudio...">
                     @error('name')
-                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        <p class="text-red-400 text-sm mt-1">{{ $message }}</p>
                     @enderror
                 </div>
 
                 <!-- Color e Icono -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                     <div>
-                        <label for="color" class="block text-sm font-medium text-gray-700 mb-2">
+                        <label for="color" class="block text-sm font-medium mb-2" style="color: #F0F2F5;">
                             Color *
                         </label>
                         <div class="flex items-center space-x-3">
-                            <input type="color" name="color" id="color" value="{{ old('color', '#3b82f6') }}"
-                                   class="w-16 h-10 border border-gray-300 rounded-lg cursor-pointer">
+                            <input type="color" name="color" id="color" value="{{ old('color', '#7E57C2') }}"
+                                   class="w-16 h-10 rounded-lg cursor-pointer transition-transform duration-300 hover:scale-105">
                             <input type="text" name="color_hex" id="color_hex" 
-                                   value="{{ old('color', '#3b82f6') }}"
-                                   class="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                   placeholder="#3b82f6">
+                                   value="{{ old('color', '#7E57C2') }}"
+                                   class="flex-1 rounded-lg px-4 py-2 focus:ring-2 transition duration-300"
+                                   style="background-color: #121826; border: 1px solid #2A3241; color: #F0F2F5;">
                         </div>
                         @error('color')
-                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                            <p class="text-red-400 text-sm mt-1">{{ $message }}</p>
                         @enderror
                     </div>
 
                     <div>
-                        <label for="icon" class="block text-sm font-medium text-gray-700 mb-2">
+                        <label for="icon" class="block text-sm font-medium mb-2" style="color: #F0F2F5;">
                             Icono (Opcional)
                         </label>
                         <input type="text" name="icon" id="icon"
                                value="{{ old('icon') }}"
-                               class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                               class="w-full rounded-lg px-4 py-2 focus:ring-2 transition duration-300"
+                               style="background-color: #121826; border: 1px solid #2A3241; color: #F0F2F5;"
                                placeholder="Ej: 💻, 📚, 👥">
-                        <p class="text-xs text-gray-500 mt-1">Puedes usar emojis como iconos</p>
+                        <p class="text-xs mt-1" style="color: #A9B4C7;">Puedes usar emojis como iconos</p>
                         @error('icon')
-                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                            <p class="text-red-400 text-sm mt-1">{{ $message }}</p>
                         @enderror
                     </div>
                 </div>
 
                 <!-- Descripción -->
                 <div class="mb-6">
-                    <label for="description" class="block text-sm font-medium text-gray-700 mb-2">
+                    <label for="description" class="block text-sm font-medium mb-2" style="color: #F0F2F5;">
                         Descripción (Opcional)
                     </label>
                     <textarea name="description" id="description" 
                               rows="3"
-                              class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                              class="w-full rounded-lg px-4 py-2 focus:ring-2 transition duration-300"
+                              style="background-color: #121826; border: 1px solid #2A3241; color: #F0F2F5;"
                               placeholder="Describe el tipo de actividades que incluye esta categoría...">{{ old('description') }}</textarea>
                     @error('description')
-                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        <p class="text-red-400 text-sm mt-1">{{ $message }}</p>
                     @enderror
                 </div>
 
                 <!-- Tipo y Peso -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <label class="block text-sm font-medium mb-2" style="color: #F0F2F5;">
                             Tipo de Actividad
                         </label>
                         <div class="space-y-2">
                             <label class="flex items-center">
                                 <input type="checkbox" name="is_productive" value="1" 
                                        {{ old('is_productive', true) ? 'checked' : '' }}
-                                       class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                                <span class="ml-2 text-sm text-gray-700">Actividad Productiva</span>
+                                       class="rounded text-violet-600 focus:ring-violet-500 transition duration-300">
+                                <span class="ml-2 text-sm" style="color: #F0F2F5;">Actividad Productiva</span>
                             </label>
-                            <p class="text-xs text-gray-500">
+                            <p class="text-xs" style="color: #A9B4C7;">
                                 Las actividades no productivas incluyen descansos, distracciones, etc.
                             </p>
                         </div>
                     </div>
 
                     <div>
-                        <label for="productivity_weight" class="block text-sm font-medium text-gray-700 mb-2">
+                        <label for="productivity_weight" class="block text-sm font-medium mb-2" style="color: #F0F2F5;">
                             Peso de Productividad *
                         </label>
                         <div class="flex items-center space-x-3">
                             <input type="range" name="productivity_weight" id="productivity_weight" 
                                    min="0" max="100" value="{{ old('productivity_weight', 80) }}"
-                                   class="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+                                   class="flex-1 h-2 rounded-lg appearance-none cursor-pointer slider transition duration-300"
                                    oninput="document.getElementById('weight_value').textContent = this.value + '%'">
-                            <span id="weight_value" class="text-sm font-medium text-gray-700 w-12">
+                            <span id="weight_value" class="text-sm font-medium w-12" style="color: #F0F2F5;">
                                 {{ old('productivity_weight', 80) }}%
                             </span>
                         </div>
-                        <div class="flex justify-between text-xs text-gray-500 mt-1">
+                        <div class="flex justify-between text-xs mt-1" style="color: #A9B4C7;">
                             <span>No productiva</span>
                             <span>Neutral</span>
                             <span>Muy productiva</span>
                         </div>
                         @error('productivity_weight')
-                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                            <p class="text-red-400 text-sm mt-1">{{ $message }}</p>
                         @enderror
                     </div>
                 </div>
@@ -119,11 +123,11 @@
                 <!-- Botones -->
                 <div class="flex justify-end space-x-4">
                     <a href="{{ route('activity-categories.index') }}" 
-                       class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition duration-200">
+                       class="px-6 py-2 rounded-lg transition duration-300 button-secondary">
                         Cancelar
                     </a>
                     <button type="submit" 
-                            class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 transition duration-200">
+                            class="px-6 py-2 rounded-lg transition duration-300 button-primary">
                         Crear Categoría
                     </button>
                 </div>
@@ -145,10 +149,10 @@ document.getElementById('color_hex').addEventListener('input', function(e) {
 // Estilos para el slider
 const sliders = document.querySelectorAll('.slider');
 sliders.forEach(slider => {
-    slider.style.background = `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${slider.value}%, #e5e7eb ${slider.value}%, #e5e7eb 100%)`;
+    slider.style.background = `linear-gradient(to right, #7E57C2 0%, #7E57C2 ${slider.value}%, #2A3241 ${slider.value}%, #2A3241 100%)`;
     
     slider.addEventListener('input', function() {
-        this.style.background = `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${this.value}%, #e5e7eb ${this.value}%, #e5e7eb 100%)`;
+        this.style.background = `linear-gradient(to right, #7E57C2 0%, #7E57C2 ${this.value}%, #2A3241 ${this.value}%, #2A3241 100%)`;
     });
 });
 </script>
@@ -159,20 +163,63 @@ sliders.forEach(slider => {
     height: 20px;
     width: 20px;
     border-radius: 50%;
-    background: #3b82f6;
+    background: #7E57C2;
     cursor: pointer;
-    border: 2px solid #ffffff;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    border: 2px solid #F0F2F5;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    transition: all 0.3s ease;
+}
+
+.slider::-webkit-slider-thumb:hover {
+    transform: scale(1.1);
+    box-shadow: 0 2px 6px rgba(126, 87, 194, 0.5);
 }
 
 .slider::-moz-range-thumb {
     height: 20px;
     width: 20px;
     border-radius: 50%;
-    background: #3b82f6;
+    background: #7E57C2;
     cursor: pointer;
-    border: 2px solid #ffffff;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    border: 2px solid #F0F2F5;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    transition: all 0.3s ease;
+}
+
+.slider::-moz-range-thumb:hover {
+    transform: scale(1.1);
+    box-shadow: 0 2px 6px rgba(126, 87, 194, 0.5);
+}
+
+.button-primary {
+    background-color: #7E57C2;
+    color: #F0F2F5;
+    box-shadow: 0 4px 6px rgba(126, 87, 194, 0.2);
+}
+
+.button-primary:hover {
+    background-color: #6d46b8;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(126, 87, 194, 0.3);
+}
+
+.button-secondary {
+    border: 1px solid #2A3241;
+    color: #A9B4C7;
+    background-color: #2A3241;
+}
+
+.button-secondary:hover {
+    background-color: #3A4251;
+    color: #F0F2F5;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+input:focus, textarea:focus {
+    outline: none;
+    border-color: #7E57C2 !important;
+    box-shadow: 0 0 0 2px rgba(126, 87, 194, 0.2) !important;
 }
 </style>
 @endsection

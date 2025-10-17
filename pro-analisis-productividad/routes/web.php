@@ -3,11 +3,17 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Auth\PasswordResetLinkController;
+use App\Http\Controllers\Auth\ResetPasswordController;
+use App\Http\Controllers\Auth\VerificationController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\TimeTrackingController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\Auth\GoogleController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ActivityCategoryController;
+use App\Http\Controllers\ProductivityTagController;
 
 /*
 |--------------------------------------------------------------------------
@@ -35,17 +41,40 @@ Route::middleware('guest')->group(function () {
     Route::post('/login', [LoginController::class, 'login']);
     Route::post('/register', [RegisterController::class, 'register']);
 
+    // Autenticación con Google
+    Route::get('/auth/google', [GoogleController::class, 'redirectToGoogle'])->name('google.login');
+    Route::get('/auth/google/callback', [GoogleController::class, 'callback']);
 
- Route::get('/auth/google', [GoogleController::class, 'redirectToGoogle'])->name('google.login');
- Route::get('/auth/google/callback', [GoogleController::class, 'callback']);
+    // Restablecimiento de contraseña - RUTAS NUEVAS
+    Route::get('/forgot-password', [PasswordResetLinkController::class, 'create'])
+        ->name('password.request');
+    
+    Route::post('/forgot-password', [PasswordResetLinkController::class, 'store'])
+        ->name('password.email');
+    
+    Route::get('/reset-password/{token}', [ResetPasswordController::class, 'showResetForm'])
+        ->name('password.reset');
+    
+    Route::post('/reset-password', [ResetPasswordController::class, 'reset'])
+        ->name('password.update');
 });
 
 // Rutas protegidas (requieren autenticación)
 Route::middleware('auth')->group(function () {
-    // Dashboard principal - CORREGIDO: Usando el controlador
+    // Verificación de email - RUTAS NUEVAS
+    Route::get('/email/verify', [VerificationController::class, 'show'])
+        ->name('verification.notice');
+    
+    Route::get('/email/verify/{id}/{hash}', [VerificationController::class, 'verify'])
+        ->name('verification.verify');
+    
+    Route::post('/email/resend', [VerificationController::class, 'resend'])
+        ->name('verification.resend');
+
+    // Dashboard principal
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     
-    // Proyectos - AÑADIDO: Esta es la ruta que faltaba
+    // Proyectos
     Route::resource('projects', ProjectController::class);
     
     // Registro de tiempo
@@ -58,6 +87,17 @@ Route::middleware('auth')->group(function () {
         Route::get('/project/{project}', [ReportController::class, 'projectReport'])->name('reports.project');
     });
 
+    // Perfil de usuario
+    Route::prefix('profile')->group(function () {
+        Route::get('/', [ProfileController::class, 'show'])->name('profile.show');
+        Route::get('/edit', [ProfileController::class, 'edit'])->name('profile.edit');
+        Route::put('/update', [ProfileController::class, 'update'])->name('profile.update');
+    });
+
+    // Categorías de actividad y tags de productividad
+    Route::resource('activity-categories', ActivityCategoryController::class);
+    Route::resource('productivity-tags', ProductivityTagController::class);
+
     // Cerrar sesión
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 });
@@ -65,16 +105,4 @@ Route::middleware('auth')->group(function () {
 // Ruta de fallback
 Route::fallback(function () {
     return redirect()->route('home');
-});
-
-Route::resource('activity-categories', ActivityCategoryController::class)->middleware('auth');
-Route::resource('productivity-tags', ProductivityTagController::class)->middleware('auth');
-
-Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-
-// Rutas de perfil (AGREGA ESTAS LÍNEAS)
-Route::middleware('auth')->group(function () {
-    Route::get('/profile', [App\Http\Controllers\ProfileController::class, 'show'])->name('profile.show');
-    Route::get('/profile/edit', [App\Http\Controllers\ProfileController::class, 'edit'])->name('profile.edit');
-    Route::put('/profile/update', [App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
 });

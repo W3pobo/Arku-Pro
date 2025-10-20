@@ -14,6 +14,7 @@ class TimeTracking extends Model
     protected $fillable = [
         'user_id',
         'project_id',
+        'task_id', // FALTA ESTA LÍNEA - AGREGAR AQUÍ
         'activity_category_id',
         'start_time',
         'end_time',
@@ -42,6 +43,11 @@ class TimeTracking extends Model
     public function project(): BelongsTo
     {
         return $this->belongsTo(Project::class);
+    }
+
+    public function task(): BelongsTo // AGREGAR TIPO DE RETORNO
+    {
+        return $this->belongsTo(Task::class);
     }
 
     public function activityCategory(): BelongsTo
@@ -156,6 +162,14 @@ class TimeTracking extends Model
     }
 
     /**
+     * Accessor para obtener el nombre de la tarea de forma segura
+     */
+    public function getTaskNameAttribute()
+    {
+        return $this->task ? $this->task->title : 'Sin tarea';
+    }
+
+    /**
      * Boot method para calcular automáticamente la duración
      */
     protected static function boot()
@@ -165,6 +179,11 @@ class TimeTracking extends Model
         static::saving(function ($model) {
             if ($model->start_time && $model->end_time) {
                 $model->duration_minutes = $model->start_time->diffInMinutes($model->end_time);
+            }
+            
+            // Calcular automáticamente el productivity_score si no está definido
+            if (empty($model->productivity_score) && $model->focus_level && $model->energy_level) {
+                $model->productivity_score = ($model->focus_level + $model->energy_level) / 2;
             }
         });
     }

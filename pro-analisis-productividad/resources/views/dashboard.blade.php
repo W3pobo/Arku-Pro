@@ -3,210 +3,314 @@
 @section('title', 'Dashboard')
 
 @section('content')
-<div class="container py-4">
-    <h1 class="mb-4 text-main">Dashboard de Productividad</h1>
-    
-    <!-- Estadísticas Principales -->
-    <div class="row mb-4">
-        @php
-            $statsCards = [
-                ['icon' => '📁', 'value' => $stats['total_projects'], 'label' => 'Proyectos Totales', 'color' => 'accent'],
-                ['icon' => '⏱️', 'value' => number_format($stats['weekly_hours'], 1).'h', 'label' => 'Horas esta Semana', 'color' => 'success'],
-                ['icon' => '📊', 'value' => number_format($stats['avg_productivity'], 1).'%', 'label' => 'Productividad', 'color' => 'warning'],
-                ['icon' => '🚀', 'value' => $stats['active_projects'], 'label' => 'Proyectos Activos', 'color' => 'danger'],
-            ];
-        @endphp
-        
-        @foreach($statsCards as $card)
-        <div class="col-md-3 col-sm-6 mb-3">
-            <div class="card-custom text-center h-100">
-                <div class="card-body-custom">
-                    <div class="fs-2 mb-2">{{ $card['icon'] }}</div>
-                    <h3 class="card-title-custom text-{{ $card['color'] }}">{{ $card['value'] }}</h3>
-                    <p class="card-text-custom">{{ $card['label'] }}</p>
-                </div>
-            </div>
-        </div>
-        @endforeach
-    </div>
-
-    <!-- Métricas de Productividad Avanzadas y Recomendaciones -->
-    <div class="row mb-4">
-        <div class="col-lg-6 mb-4">
-            <div class="card-custom h-100">
-                <div class="card-header-custom">
-                    <h5 class="card-title-custom mb-0">Análisis de Productividad</h5>
-                </div>
-                <div class="card-body-custom">
-                    @foreach([
-                        'efficiency_score' => ['Eficiencia General', 'success'],
-                        'focus_ratio' => ['Ratio de Concentración', 'accent'], 
-                        'consistency_score' => ['Consistencia', 'info']
-                    ] as $key => [$label, $color])
-                    <div class="mb-3">
-                        <div class="d-flex justify-content-between mb-1">
-                            <span class="small text-secondary">{{ $label }}</span>
-                            <span class="small text-secondary">{{ $productivityMetrics[$key] ?? 0 }}%</span>
-                        </div>
-                        <div class="progress-custom" style="height: 8px;">
-                            <div class="progress-bar-custom bg-{{ $color }}" 
-                                 style="width: {{ $productivityMetrics[$key] ?? 0 }}%">
-                            </div>
-                        </div>
-                    </div>
-                    @endforeach
-                    
-                    <div class="row mt-3 pt-3 border-top border-gray-600">
-                        <div class="col-4 text-center">
-                            <div class="h4 text-main">{{ $productivityMetrics['total_time_hours'] ?? 0 }}</div>
-                            <small class="text-secondary">Horas Totales</small>
-                        </div>
-                        <div class="col-4 text-center">
-                            <div class="h4 text-success">{{ $productivityMetrics['productive_time_hours'] ?? 0 }}</div>
-                            <small class="text-secondary">Horas Productivas</small>
-                        </div>
-                        <div class="col-4 text-center">
-                            <div class="h4 text-accent">{{ $productivityMetrics['tasks_completed'] ?? 0 }}</div>
-                            <small class="text-secondary">Tareas Completadas</small>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-lg-6 mb-4">
-            <div class="card-custom h-100">
-                <div class="card-header-custom">
-                    <h5 class="card-title-custom mb-0">Recomendaciones</h5>
-                </div>
-                <div class="card-body-custom">
-                    @forelse($recommendations ?? [] as $recommendation)
-                    <div class="alert-custom alert-info d-flex align-items-start mb-2 py-2">
-                        <i class="fas fa-lightbulb me-2 mt-1 text-accent"></i>
-                        <div class="small text-main">{{ $recommendation }}</div>
-                    </div>
-                    @empty
-                    <div class="text-center text-secondary py-3">
-                        <i class="fas fa-info-circle fa-2x mb-2 text-accent"></i>
-                        <p class="mb-0 text-main">No hay recomendaciones disponibles</p>
-                        <small class="text-secondary">¡Sigue trabajando!</small>
-                    </div>
-                    @endforelse
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Distribución por Categorías -->
-    <div class="card-custom mb-4">
-        <div class="card-header-custom">
-            <h5 class="card-title-custom mb-0">Distribución por Categorías</h5>
-        </div>
-        <div class="card-body-custom">
-            <div class="row">
-                @forelse($activityStats ?? [] as $activity)
-                <div class="col-md-4 col-sm-6 mb-3">
-                    <div class="card-custom border-custom h-100">
+<div class="container-fluid py-4">
+    <div class="row">
+        <!-- Contenido Principal -->
+        <div class="col-lg-9 col-xl-10">
+            <h1 class="mb-4 text-main">Dashboard de Productividad</h1>
+            
+            <!-- Estadísticas Principales -->
+            <div class="row mb-4">
+                @php
+                    $statsCards = [
+                        ['icon' => '📁', 'value' => $stats['total_projects'], 'label' => 'Proyectos Totales', 'color' => 'accent'],
+                        ['icon' => '⏱️', 'value' => number_format($stats['weekly_hours'], 1).'h', 'label' => 'Horas esta Semana', 'color' => 'success'],
+                        ['icon' => '📊', 'value' => number_format($stats['avg_productivity'], 1).'%', 'label' => 'Productividad', 'color' => 'warning'],
+                        ['icon' => '🚀', 'value' => $stats['active_projects'], 'label' => 'Proyectos Activos', 'color' => 'danger'],
+                        ['icon' => '✅', 'value' => $stats['pending_tasks'], 'label' => 'Tareas Pendientes', 'color' => 'info'],
+                    ];
+                @endphp
+                
+                @foreach($statsCards as $card)
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="card-custom text-center h-100">
                         <div class="card-body-custom">
-                            <div class="d-flex justify-content-between align-items-start mb-2">
-                                <h6 class="card-title-custom mb-0">{{ $activity->activity_type }}</h6>
-                                <span class="badge-custom bg-accent">{{ round($activity->total_minutes / 60, 1) }}h</span>
+                            <div class="fs-2 mb-2">{{ $card['icon'] }}</div>
+                            <h3 class="card-title-custom text-{{ $card['color'] }}">{{ $card['value'] }}</h3>
+                            <p class="card-text-custom">{{ $card['label'] }}</p>
+                        </div>
+                    </div>
+                </div>
+                @endforeach
+            </div>
+
+            <!-- Tareas Recientes -->
+            <div class="card-custom mb-4">
+                <div class="card-header-custom d-flex justify-content-between align-items-center">
+                    <h5 class="card-title-custom mb-0">Tareas Recientes</h5>
+                    <a href="{{ route('tasks.index') }}" class="btn btn-accent btn-sm">
+                        <i class="fas fa-tasks me-1"></i>Ver Todas
+                    </a>
+                </div>
+                <div class="card-body-custom">
+                    <div class="list-group-custom list-group-flush">
+                        @forelse($recentTasks as $task)
+                        <div class="list-group-item-custom d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <div class="bg-{{ $task->priority_badge['color'] }} text-white rounded-circle d-flex align-items-center justify-content-center" 
+                                     style="width: 40px; height: 40px;">
+                                    @if($task->status == 'completed')
+                                        <i class="fas fa-check"></i>
+                                    @elseif($task->status == 'in_progress')
+                                        <i class="fas fa-spinner"></i>
+                                    @else
+                                        <i class="fas fa-clock"></i>
+                                    @endif
+                                </div>
                             </div>
-                            @php
-                                $totalHours = $activityStats->sum('total_minutes') / 60;
-                                $activityHours = $activity->total_minutes / 60;
-                                $percentage = $totalHours > 0 ? ($activityHours / $totalHours) * 100 : 0;
-                            @endphp
-                            <div class="progress-custom mb-2" style="height: 6px;">
-                                <div class="progress-bar-custom bg-accent" style="width: {{ $percentage }}%"></div>
+                            <div class="flex-grow-1 ms-3">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h6 class="mb-1 text-main {{ $task->status == 'completed' ? 'text-decoration-line-through' : '' }}">
+                                            {{ $task->title }}
+                                        </h6>
+                                        <p class="mb-1 small text-secondary">
+                                            {{ $task->project->name }} • 
+                                            @if($task->due_date)
+                                                Vence: {{ $task->due_date->format('d/m/Y') }}
+                                                @if($task->is_overdue)
+                                                    <span class="badge bg-danger ms-1">Vencida</span>
+                                                @endif
+                                            @else
+                                                Sin fecha límite
+                                            @endif
+                                        </p>
+                                    </div>
+                                    <div class="text-end">
+                                        <span class="badge-custom bg-{{ $task->priority_badge['color'] }}">
+                                            {{ $task->priority_badge['text'] }}
+                                        </span>
+                                        <br>
+                                        <small class="text-secondary">{{ $task->status_badge['text'] }}</small>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="d-flex justify-content-between small text-secondary">
-                                <span>{{ round($percentage, 1) }}%</span>
-                                <span>Prod: {{ round($activity->avg_productivity, 1) }}%</span>
+                        </div>
+                        @empty
+                        <div class="text-center py-4">
+                            <i class="fas fa-tasks fa-2x text-accent mb-3"></i>
+                            <p class="text-secondary mb-2">No hay tareas pendientes</p>
+                            <a href="{{ route('tasks.create') }}" class="btn btn-accent btn-sm">
+                                <i class="fas fa-plus me-1"></i>Crear Primera Tarea
+                            </a>
+                        </div>
+                        @endforelse
+                    </div>
+                </div>
+            </div>
+
+            <!-- Métricas de Productividad Avanzadas y Recomendaciones -->
+            <div class="row mb-4">
+                <div class="col-lg-6 mb-4">
+                    <div class="card-custom h-100">
+                        <div class="card-header-custom">
+                            <h5 class="card-title-custom mb-0">Análisis de Productividad</h5>
+                        </div>
+                        <div class="card-body-custom">
+                            @foreach([
+                                'efficiency_score' => ['Eficiencia General', 'success'],
+                                'focus_ratio' => ['Ratio de Concentración', 'accent'], 
+                                'consistency_score' => ['Consistencia', 'info']
+                            ] as $key => [$label, $color])
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span class="small text-secondary">{{ $label }}</span>
+                                    <span class="small text-secondary">{{ $productivityMetrics[$key] ?? 0 }}%</span>
+                                </div>
+                                <div class="progress-custom" style="height: 8px;">
+                                    <div class="progress-bar-custom bg-{{ $color }}" 
+                                         style="width: {{ $productivityMetrics[$key] ?? 0 }}%">
+                                    </div>
+                                </div>
+                            </div>
+                            @endforeach
+                            
+                            <div class="row mt-3 pt-3 border-top border-gray-600">
+                                <div class="col-4 text-center">
+                                    <div class="h4 text-main">{{ $productivityMetrics['total_time_hours'] ?? 0 }}</div>
+                                    <small class="text-secondary">Horas Totales</small>
+                                </div>
+                                <div class="col-4 text-center">
+                                    <div class="h4 text-success">{{ $productivityMetrics['productive_time_hours'] ?? 0 }}</div>
+                                    <small class="text-secondary">Horas Productivas</small>
+                                </div>
+                                <div class="col-4 text-center">
+                                    <div class="h4 text-accent">{{ $productivityMetrics['tasks_completed'] ?? 0 }}</div>
+                                    <small class="text-secondary">Tareas Completadas</small>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                @empty
-                <div class="col-12 text-center py-4">
-                    <i class="fas fa-chart-pie fa-3x text-accent mb-3"></i>
-                    <p class="text-secondary">No hay datos de categorías disponibles</p>
-                </div>
-                @endforelse
-            </div>
-        </div>
-    </div>
-    
-    <!-- Gráficos -->
-    <div class="row mb-4">
-        <div class="col-lg-6 mb-4">
-            <div class="card-custom h-100">
-                <div class="card-header-custom">
-                    <h5 class="card-title-custom mb-0">Actividad Semanal</h5>
-                </div>
-                <div class="card-body-custom">
-                    <canvas id="weeklyActivityChart" height="250"></canvas>
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-lg-6 mb-4">
-            <div class="card-custom h-100">
-                <div class="card-header-custom">
-                    <h5 class="card-title-custom mb-0">Distribución por Tipo</h5>
-                </div>
-                <div class="card-body-custom">
-                    <canvas id="activityTypeChart" height="250"></canvas>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Actividad Reciente -->
-    <div class="card-custom">
-        <div class="card-header-custom">
-            <h5 class="card-title-custom mb-0">Actividad Reciente</h5>
-        </div>
-        <div class="card-body-custom">
-            <div class="list-group-custom list-group-flush">
-                @forelse($recentActivities as $activity)
-                <div class="list-group-item-custom d-flex align-items-center">
-                    <div class="flex-shrink-0">
-                        <div class="bg-accent text-white rounded-circle d-flex align-items-center justify-content-center" 
-                             style="width: 40px; height: 40px;">
-                            @if($activity->activityCategory && $activity->activityCategory->icon)
-                                <span>{{ $activity->activityCategory->icon }}</span>
-                            @else
-                                <i class="fas fa-clock"></i>
-                            @endif
+
+                <div class="col-lg-6 mb-4">
+                    <div class="card-custom h-100">
+                        <div class="card-header-custom">
+                            <h5 class="card-title-custom mb-0">Recomendaciones del Sistema</h5>
+                        </div>
+                        <div class="card-body-custom">
+                            @forelse($recommendations ?? [] as $recommendation)
+                            <div class="alert-custom alert-info d-flex align-items-start mb-2 py-2">
+                                <i class="fas fa-lightbulb me-2 mt-1 text-accent"></i>
+                                <div class="small text-main">{{ $recommendation }}</div>
+                            </div>
+                            @empty
+                            <div class="text-center text-secondary py-3">
+                                <i class="fas fa-info-circle fa-2x mb-2 text-accent"></i>
+                                <p class="mb-0 text-main">No hay recomendaciones disponibles</p>
+                                <small class="text-secondary">¡Sigue trabajando!</small>
+                            </div>
+                            @endforelse
                         </div>
                     </div>
-                    <div class="flex-grow-1 ms-3">
-                        <div class="d-flex justify-content-between align-items-start">
-                            <div>
-                                <h6 class="mb-1 text-main">{{ $activity->project->name ?? 'Sin proyecto' }} - {{ $activity->activity_type }}</h6>
-                                <p class="mb-1 small text-secondary">
-                                    {{ $activity->start_time->format('d/m/Y H:i') }} • 
-                                    {{ $activity->duration_minutes }} minutos • 
-                                    <span class="fw-bold" style="color: {{ $activity->getProductivityColorAttribute() }}">
-                                        {{ $activity->productivity_score }}% productividad
+                </div>
+            </div>
+
+            <!-- Distribución por Categorías -->
+            <div class="card-custom mb-4">
+                <div class="card-header-custom">
+                    <h5 class="card-title-custom mb-0">Distribución por Categorías</h5>
+                </div>
+                <div class="card-body-custom">
+                    <div class="row">
+                        @forelse($activityStats ?? [] as $activity)
+                        <div class="col-md-4 col-sm-6 mb-3">
+                            <div class="card-custom border-custom h-100">
+                                <div class="card-body-custom">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <h6 class="card-title-custom mb-0">{{ $activity->activity_type }}</h6>
+                                        <span class="badge-custom bg-accent">{{ round($activity->total_minutes / 60, 1) }}h</span>
+                                    </div>
+                                    @php
+                                        $totalHours = $activityStats->sum('total_minutes') / 60;
+                                        $activityHours = $activity->total_minutes / 60;
+                                        $percentage = $totalHours > 0 ? ($activityHours / $totalHours) * 100 : 0;
+                                    @endphp
+                                    <div class="progress-custom mb-2" style="height: 6px;">
+                                        <div class="progress-bar-custom bg-accent" style="width: {{ $percentage }}%"></div>
+                                    </div>
+                                    <div class="d-flex justify-content-between small text-secondary">
+                                        <span>{{ round($percentage, 1) }}%</span>
+                                        <span>Prod: {{ round($activity->avg_productivity, 1) }}%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        @empty
+                        <div class="col-12 text-center py-4">
+                            <i class="fas fa-chart-pie fa-3x text-accent mb-3"></i>
+                            <p class="text-secondary">No hay datos de categorías disponibles</p>
+                        </div>
+                        @endforelse
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Gráficos -->
+            <div class="row mb-4">
+                <div class="col-lg-6 mb-4">
+                    <div class="card-custom h-100">
+                        <div class="card-header-custom">
+                            <h5 class="card-title-custom mb-0">Actividad Semanal</h5>
+                        </div>
+                        <div class="card-body-custom">
+                            <canvas id="weeklyActivityChart" height="250"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-6 mb-4">
+                    <div class="card-custom h-100">
+                        <div class="card-header-custom">
+                            <h5 class="card-title-custom mb-0">Distribución por Tipo</h5>
+                        </div>
+                        <div class="card-body-custom">
+                            <canvas id="activityTypeChart" height="250"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Actividad Reciente -->
+            <div class="card-custom">
+                <div class="card-header-custom">
+                    <h5 class="card-title-custom mb-0">Actividad Reciente</h5>
+                </div>
+                <div class="card-body-custom">
+                    <div class="list-group-custom list-group-flush">
+                        @forelse($recentActivities as $activity)
+                        <div class="list-group-item-custom d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <div class="bg-accent text-white rounded-circle d-flex align-items-center justify-content-center" 
+                                     style="width: 40px; height: 40px;">
+                                    @if($activity->activityCategory && $activity->activityCategory->icon)
+                                        <span>{{ $activity->activityCategory->icon }}</span>
+                                    @else
+                                        <i class="fas fa-clock"></i>
+                                    @endif
+                                </div>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h6 class="mb-1 text-main">{{ $activity->project->name ?? 'Sin proyecto' }} - {{ $activity->activity_type }}</h6>
+                                        <p class="mb-1 small text-secondary">
+                                            {{ $activity->start_time->format('d/m/Y H:i') }} • 
+                                            {{ $activity->duration_minutes }} minutos • 
+                                            <span class="fw-bold" style="color: {{ $activity->getProductivityColorAttribute() }}">
+                                                {{ $activity->productivity_score }}% productividad
+                                            </span>
+                                        </p>
+                                    </div>
+                                    @if($activity->activityCategory)
+                                    <span class="badge-custom" style="background-color: {{ $activity->activityCategory->color }}20; color: {{ $activity->activityCategory->color }};">
+                                        {{ $activity->activityCategory->icon }} {{ $activity->activityCategory->name }}
                                     </span>
-                                </p>
+                                    @endif
+                                </div>
                             </div>
-                            @if($activity->activityCategory)
-                            <span class="badge-custom" style="background-color: {{ $activity->activityCategory->color }}20; color: {{ $activity->activityCategory->color }};">
-                                {{ $activity->activityCategory->icon }} {{ $activity->activityCategory->name }}
-                            </span>
-                            @endif
                         </div>
+                        @empty
+                        <div class="text-center py-4">
+                            <i class="fas fa-history fa-2x text-accent mb-3"></i>
+                            <p class="text-secondary mb-0">No hay actividad reciente</p>
+                        </div>
+                        @endforelse
                     </div>
                 </div>
-                @empty
-                <div class="text-center py-4">
-                    <i class="fas fa-history fa-2x text-accent mb-3"></i>
-                    <p class="text-secondary mb-0">No hay actividad reciente</p>
+            </div>
+        </div>
+
+        <!-- Sidebar de Recomendaciones -->
+        <div class="col-lg-3 col-xl-2">
+            @include('components.recommendations-sidebar')
+            
+            <!-- Widget adicional de estadísticas rápidas -->
+            <div class="card-custom mb-4">
+                <div class="card-header-custom">
+                    <h6 class="card-title-custom mb-0">
+                        <i class="fas fa-chart-line me-2 text-accent"></i>Resumen Rápido
+                    </h6>
                 </div>
-                @endforelse
+                <div class="card-body-custom p-3">
+                    <div class="mb-3">
+                        <small class="text-secondary d-block">Productividad Hoy</small>
+                        <div class="d-flex align-items-center">
+                            <div class="progress-custom flex-grow-1 me-2" style="height: 6px;">
+                                <div class="progress-bar-custom bg-success" style="width: {{ $productivityMetrics['today_productivity'] ?? 0 }}%"></div>
+                            </div>
+                            <small class="text-success">{{ $productivityMetrics['today_productivity'] ?? 0 }}%</small>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <small class="text-secondary d-block">Tareas Pendientes</small>
+                        <h6 class="text-warning mb-0">{{ $stats['pending_tasks'] ?? 0 }}</h6>
+                    </div>
+                    <div>
+                        <small class="text-secondary d-block">Sesión Actual</small>
+                        <h6 class="text-accent mb-0">{{ $productivityMetrics['current_session_minutes'] ?? 0 }} min</h6>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -344,6 +448,53 @@ body {
 
 .text-info { color: #3498db !important; }
 .bg-info { background-color: #3498db !important; }
+
+/* Estilos específicos para el sidebar de recomendaciones */
+.recommendation-item {
+    border-left: 3px solid transparent;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.recommendation-item:hover {
+    border-left-color: var(--accent);
+    background-color: rgba(126, 87, 194, 0.05);
+}
+
+#sidebar-recommendations {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+/* Scrollbar personalizado para el tema oscuro */
+#sidebar-recommendations::-webkit-scrollbar {
+    width: 6px;
+}
+
+#sidebar-recommendations::-webkit-scrollbar-track {
+    background: rgba(255,255,255,0.1);
+    border-radius: 3px;
+}
+
+#sidebar-recommendations::-webkit-scrollbar-thumb {
+    background: var(--accent);
+    border-radius: 3px;
+}
+
+#sidebar-recommendations::-webkit-scrollbar-thumb:hover {
+    background: var(--hover-accent);
+}
+
+/* Responsive */
+@media (max-width: 991.98px) {
+    .col-lg-3, .col-lg-9 {
+        width: 100%;
+    }
+    
+    .col-lg-3 {
+        margin-top: 2rem;
+    }
+}
 </style>
 @endsection
 
@@ -426,5 +577,6 @@ body {
             cutout: '60%'
         }
     });
+
 </script>
 @endpush

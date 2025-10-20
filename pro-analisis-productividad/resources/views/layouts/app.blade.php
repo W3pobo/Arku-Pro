@@ -28,7 +28,7 @@
         
         body { 
             background-color: var(--bg-primary) !important; 
-            color: var(--text-primary); 
+            color: var(--text-primary) !important; 
             font-family: 'Nunito', 'Segoe UI', sans-serif;
             min-height: 100vh;
         }
@@ -130,6 +130,292 @@
             background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.8%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
         }
         
+        /* ===== ESTILOS PARA COMPONENTES BOOTSTRAP ===== */
+
+        /* Cards */
+        .card {
+            background-color: var(--bg-secondary) !important;
+            border: 1px solid var(--border-color) !important;
+            color: var(--text-primary) !important;
+            border-radius: 12px !important;
+        }
+
+        .card-header {
+            background-color: rgba(0, 0, 0, 0.2) !important;
+            border-bottom: 1px solid var(--border-color) !important;
+            color: var(--text-primary) !important;
+        }
+
+        .card-footer {
+            background-color: rgba(0, 0, 0, 0.2) !important;
+            border-top: 1px solid var(--border-color) !important;
+            color: var(--text-primary) !important;
+        }
+
+        /* Tables */
+        .table {
+            color: var(--text-primary) !important;
+            border-color: var(--border-color) !important;
+        }
+
+        .table th {
+            background-color: rgba(0, 0, 0, 0.3) !important;
+            border-color: var(--border-color) !important;
+            color: var(--text-primary) !important;
+            font-weight: 600;
+        }
+
+        .table td {
+            border-color: var(--border-color) !important;
+            background-color: transparent !important;
+        }
+
+        .table-hover tbody tr:hover {
+            background-color: rgba(126, 87, 194, 0.1) !important;
+            color: var(--text-primary) !important;
+        }
+
+        /* Forms */
+        .form-control, .form-select {
+            background-color: rgba(0, 0, 0, 0.3) !important;
+            border: 1px solid var(--border-color) !important;
+            color: var(--text-primary) !important;
+            border-radius: 8px !important;
+        }
+
+        .form-control:focus, .form-select:focus {
+            background-color: rgba(0, 0, 0, 0.4) !important;
+            border-color: var(--accent) !important;
+            color: var(--text-primary) !important;
+            box-shadow: 0 0 0 0.2rem rgba(126, 87, 194, 0.25) !important;
+        }
+
+        .form-label {
+            color: var(--text-primary) !important;
+            font-weight: 600;
+        }
+
+        .form-control::placeholder {
+            color: var(--text-secondary) !important;
+            opacity: 0.7;
+        }
+
+        /* Buttons */
+        .btn {
+            border-radius: 8px !important;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent), var(--accent-hover)) !important;
+            border: none !important;
+            color: white !important;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(126, 87, 194, 0.4) !important;
+        }
+
+        .btn-secondary {
+            background-color: var(--border-color) !important;
+            border-color: var(--border-color) !important;
+            color: var(--text-primary) !important;
+        }
+
+        .btn-secondary:hover {
+            background-color: #4a5261 !important;
+            border-color: #4a5261 !important;
+            color: var(--text-primary) !important;
+        }
+
+        .btn-outline-secondary {
+            border-color: var(--border-color) !important;
+            color: var(--text-secondary) !important;
+            background: transparent !important;
+        }
+
+        .btn-outline-secondary:hover {
+            background-color: var(--border-color) !important;
+            border-color: var(--border-color) !important;
+            color: var(--text-primary) !important;
+        }
+
+        /* Badges */
+        .badge {
+            border-radius: 20px !important;
+            font-weight: 500;
+            padding: 0.5rem 0.75rem !important;
+        }
+
+        .bg-primary {
+            background: linear-gradient(135deg, var(--accent), var(--accent-hover)) !important;
+        }
+
+        .bg-secondary {
+            background-color: var(--border-color) !important;
+        }
+
+        .bg-success {
+            background-color: var(--success) !important;
+        }
+
+        .bg-warning {
+            background-color: var(--warning) !important;
+            color: #000 !important;
+        }
+
+        .bg-danger {
+            background-color: var(--danger) !important;
+        }
+
+        .bg-info {
+            background-color: #3b82f6 !important;
+        }
+
+        /* Pagination */
+        .pagination .page-link {
+            background-color: var(--bg-secondary) !important;
+            border-color: var(--border-color) !important;
+            color: var(--text-primary) !important;
+            border-radius: 8px !important;
+            margin: 0 2px;
+        }
+
+        .pagination .page-link:hover {
+            background-color: var(--accent) !important;
+            border-color: var(--accent) !important;
+            color: white !important;
+        }
+
+        .pagination .page-item.active .page-link {
+            background-color: var(--accent) !important;
+            border-color: var(--accent) !important;
+            color: white !important;
+        }
+
+        /* Alerts */
+        .alert {
+            border: none !important;
+            border-radius: 12px !important;
+            border-left: 4px solid transparent !important;
+        }
+
+        .alert-success {
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.9), rgba(34, 197, 94, 0.7)) !important;
+            color: white !important;
+            border-left-color: var(--success) !important;
+        }
+
+        .alert-danger {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.9), rgba(239, 68, 68, 0.7)) !important;
+            color: white !important;
+            border-left-color: var(--danger) !important;
+        }
+
+        .alert-warning {
+            background: linear-gradient(135deg, rgba(234, 179, 8, 0.9), rgba(234, 179, 8, 0.7)) !important;
+            color: #000 !important;
+            border-left-color: var(--warning) !important;
+        }
+
+        .alert-info {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.9), rgba(59, 130, 246, 0.7)) !important;
+            color: white !important;
+            border-left-color: #3b82f6 !important;
+        }
+
+        /* Modals */
+        .modal-content {
+            background-color: var(--bg-secondary) !important;
+            border: 1px solid var(--border-color) !important;
+            color: var(--text-primary) !important;
+            border-radius: 16px !important;
+        }
+
+        .modal-header {
+            border-bottom: 1px solid var(--border-color) !important;
+        }
+
+        .modal-footer {
+            border-top: 1px solid var(--border-color) !important;
+        }
+
+        /* List group */
+        .list-group-item {
+            background-color: var(--bg-secondary) !important;
+            border-color: var(--border-color) !important;
+            color: var(--text-primary) !important;
+        }
+
+        .list-group-item:hover {
+            background-color: rgba(126, 87, 194, 0.1) !important;
+        }
+
+        /* Progress bars */
+        .progress {
+            background-color: rgba(0, 0, 0, 0.3) !important;
+            border-radius: 10px !important;
+        }
+
+        .progress-bar {
+            background: linear-gradient(135deg, var(--accent), var(--accent-hover)) !important;
+            border-radius: 10px !important;
+        }
+
+        /* Text colors */
+        .text-muted {
+            color: var(--text-secondary) !important;
+        }
+
+        .text-primary {
+            color: var(--accent) !important;
+        }
+
+        .text-success {
+            color: var(--success) !important;
+        }
+
+        .text-warning {
+            color: var(--warning) !important;
+        }
+
+        .text-danger {
+            color: var(--danger) !important;
+        }
+
+        /* Background colors */
+        .bg-dark {
+            background-color: var(--bg-primary) !important;
+        }
+
+        .bg-light {
+            background-color: var(--bg-secondary) !important;
+            color: var(--text-primary) !important;
+        }
+
+        /* Border colors */
+        .border {
+            border-color: var(--border-color) !important;
+        }
+
+        .border-top {
+            border-top-color: var(--border-color) !important;
+        }
+
+        .border-bottom {
+            border-bottom-color: var(--border-color) !important;
+        }
+
+        .border-start {
+            border-left-color: var(--border-color) !important;
+        }
+
+        .border-end {
+            border-right-color: var(--border-color) !important;
+        }
+
         /* Smooth scrolling */
         html {
             scroll-behavior: smooth;
@@ -153,6 +439,7 @@
             background: var(--accent-hover);
         }
     </style>
+    @stack('styles')
 </head>
 <body>
     <div id="app">
@@ -198,6 +485,11 @@
                                 <a class="nav-link" href="{{ route('reports.index') }}">
                                     <i class="fas fa-chart-bar me-1"></i>Reportes
                                 </a>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ route('tasks.index') }}">
+                                    <i class="fas fa-tasks me-2"></i>Tareas
+                                </a>
+                            </li>
                             </li>
                             
                             <!-- Dropdown de usuario -->

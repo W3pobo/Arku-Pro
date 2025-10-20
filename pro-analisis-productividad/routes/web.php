@@ -14,6 +14,8 @@ use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ActivityCategoryController;
 use App\Http\Controllers\ProductivityTagController;
+use App\Http\Controllers\RecommendationController;
+use App\Http\Controllers\TaskController;
 
 /*
 |--------------------------------------------------------------------------
@@ -98,6 +100,9 @@ Route::middleware('auth')->group(function () {
     Route::resource('activity-categories', ActivityCategoryController::class);
     Route::resource('productivity-tags', ProductivityTagController::class);
 
+    Route::resource('tasks', TaskController::class);
+    Route::post('/tasks/{task}/update-status', [TaskController::class, 'updateStatus'])->name('tasks.update-status');
+
     // Cerrar sesión
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 });
@@ -105,4 +110,15 @@ Route::middleware('auth')->group(function () {
 // Ruta de fallback
 Route::fallback(function () {
     return redirect()->route('home');
+});
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/recommendations', [RecommendationController::class, 'showRecommendationsPage'])
+        ->name('recommendations');
+    
+    Route::get('/api/recommendations', [RecommendationController::class, 'getRecommendations'])
+        ->name('api.recommendations');
+    
+    Route::post('/api/interaction', [RecommendationController::class, 'recordInteraction'])
+        ->name('api.record_interaction');
 });

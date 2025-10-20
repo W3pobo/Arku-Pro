@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Project;
 use App\Models\TimeTracking;
+use App\Models\Task; // FALTA ESTA IMPORTACIÓN
 use Carbon\Carbon;
 use App\Services\ProductivityCalculator;
 
@@ -28,6 +29,7 @@ class DashboardController extends Controller
             'active_projects' => $user->projects()->where('status', 'active')->count(),
             'weekly_hours' => $this->getWeeklyHours($user),
             'avg_productivity' => $this->calculateAverageProductivity($user),
+            'pending_tasks' => $this->getPendingTasksCount($user),
         ];
 
         // --- 2. DATOS PARA LA LISTA DE ACTIVIDAD RECIENTE ---
@@ -43,22 +45,32 @@ class DashboardController extends Controller
         // --- 4. DATOS PARA EL GRÁFICO DE TIPO DE ACTIVIDAD (DONA) ---
         $activityTypeChartData = $this->getActivityTypeChartData($user);
 
-        // --- 5. NUEVAS MÉTRICAS DE PRODUCTIVIDAD AVANZADAS ---
+        // --- 5. MÉTRICAS DE PRODUCTIVIDAD AVANZADAS ---
         $productivityMetrics = $this->calculateProductivityMetrics($user);
-        $recommendations = $this->generateRecommendations($productivityMetrics);
-
-        // --- 6. ESTADÍSTICAS DE ACTIVIDAD POR CATEGORÍA ---
+        
+        // --- 6. RECOMENDACIONES DEL SISTEMA ---
+        $systemRecommendations = $this->generateBasicRecommendations($user);
+        
+        // --- 7. ESTADÍSTICAS DE ACTIVIDAD POR CATEGORÍA ---
         $activityStats = $this->getActivityStats($user);
         
-        // --- 7. ENVIAR TODOS LOS DATOS A LA VISTA ---
+        // --- 8. DATOS PARA EL WIDGET DE RESUMEN RÁPIDO ---
+        $quickStats = $this->getQuickStats($user, $productivityMetrics);
+
+        // --- 9. TAREAS RECIENTES ---
+        $recentTasks = $this->getRecentTasks($user);
+
+        // --- 10. ENVIAR TODOS LOS DATOS A LA VISTA ---
         return view('dashboard', compact(
             'stats', 
             'recentActivities',
             'weeklyChartData',
             'activityTypeChartData',
             'productivityMetrics',
-            'recommendations',
-            'activityStats'
+            'systemRecommendations',
+            'activityStats',
+            'quickStats',
+            'recentTasks'
         ));
     }
 
@@ -165,7 +177,7 @@ class DashboardController extends Controller
     }
 
     /**
-     * Calcular métricas de productividad avanzadas
+     * Calcular métricas de productividad avanzadas (CORREGIDO)
      */
     private function calculateProductivityMetrics($user)
     {
@@ -181,54 +193,157 @@ class DashboardController extends Controller
                 'total_time_hours' => 0,
                 'productive_time_hours' => 0,
                 'tasks_completed' => 0,
+                'today_productivity' => 0,
+                'current_session_minutes' => 0,
             ];
         }
 
         $totalMinutes = $timeTrackings->sum('duration_minutes');
-        $productiveMinutes = $timeTrackings->where('is_productive', true)->sum('duration_minutes');
+        
+        // CORRECCIÓN: Usar focus_level para determinar tiempo productivo
+        // Consideramos productivo cuando focus_level > 60
+        $productiveMinutes = $timeTrackings->sum(function($tracking) {
+            return ($tracking->focus_level ?? 0) > 60 ? $tracking->duration_minutes : 0;
+        });
         
         // Calcular consistencia (días con actividad)
         $daysWithActivity = $timeTrackings->groupBy(function($tracking) {
             return $tracking->start_time->format('Y-m-d');
         })->count();
 
+        // Productividad de hoy
+        $todayTimeTrackings = $user->timeTrackings()
+            ->whereDate('start_time', Carbon::today())
+            ->get();
+
+        $todayMinutes = $todayTimeTrackings->sum('duration_minutes');
+        $todayProductiveMinutes = $todayTimeTrackings->sum(function($tracking) {
+            return ($tracking->focus_level ?? 0) > 60 ? $tracking->duration_minutes : 0;
+        });
+
+        $todayProductivity = $todayMinutes > 0 ? ($todayProductiveMinutes / $todayMinutes) * 100 : 0;
+
+        // Sesión actual (últimas 2 horas)
+        $currentSessionMinutes = $user->timeTrackings()
+            ->where('start_time', '>=', Carbon::now()->subHours(2))
+            ->sum('duration_minutes');
+
         return [
             'efficiency_score' => $totalMinutes > 0 ? round(($productiveMinutes / $totalMinutes) * 100, 1) : 0,
-            'focus_ratio' => round($timeTrackings->avg('focus_level'), 1),
+            'focus_ratio' => round($timeTrackings->avg('focus_level') ?? 0, 1),
             'consistency_score' => round(($daysWithActivity / 30) * 100, 1),
             'total_time_hours' => round($totalMinutes / 60, 1),
             'productive_time_hours' => round($productiveMinutes / 60, 1),
             'tasks_completed' => $timeTrackings->count(),
+            'today_productivity' => round($todayProductivity, 1),
+            'current_session_minutes' => $currentSessionMinutes,
         ];
     }
 
     /**
-     * Generar recomendaciones basadas en métricas
+     * Generar recomendaciones básicas
      */
-    private function generateRecommendations($metrics)
+    private function generateBasicRecommendations($user)
     {
         $recommendations = [];
+        $projectCount = $user->projects()->count();
+        $timeTrackingCount = $user->timeTrackings()->count();
+        $taskCount = $user->tasks()->count();
 
-        if ($metrics['efficiency_score'] < 50) {
-            $recommendations[] = "Tu eficiencia es baja. Considera eliminar distracciones durante el trabajo.";
+        if ($projectCount === 0) {
+            $recommendations[] = "🎯 Crea tu primer proyecto para comenzar a trackear tu tiempo efectivamente.";
+            $recommendations[] = "📝 Organiza tus tareas en proyectos para mejor seguimiento.";
         }
 
-        if ($metrics['focus_ratio'] < 60) {
-            $recommendations[] = "Intenta trabajar en sesiones más largas y enfocadas (mínimo 25 minutos).";
+        if ($timeTrackingCount === 0) {
+            $recommendations[] = "⏱️ Comienza registrando tu tiempo de trabajo para obtener insights personalizados.";
+            $recommendations[] = "📊 El sistema aprenderá de tus patrones para darte recomendaciones precisas.";
         }
 
-        if ($metrics['consistency_score'] < 30) {
-            $recommendations[] = "Trabaja en establecer una rutina más consistente.";
+        if ($taskCount === 0) {
+            $recommendations[] = "✅ Crea tu primera tarea para organizar mejor tu trabajo.";
+            $recommendations[] = "📋 Las tareas te ayudan a desglosar proyectos en acciones concretas.";
         }
 
-        if ($metrics['total_time_hours'] < 10) {
-            $recommendations[] = "Considera aumentar tu tiempo de trabajo semanal para mejores resultados.";
+        if ($projectCount > 0 && $timeTrackingCount > 0 && $taskCount > 0) {
+            $recommendations[] = "🚀 ¡Buen trabajo! El sistema está analizando tus datos para recomendaciones personalizadas.";
+            $recommendations[] = "💡 Completa más sesiones de trabajo para mejorar las recomendaciones del sistema de IA.";
+            
+            // Análisis de enfoque reciente
+            $recentFocus = $user->timeTrackings()
+                ->where('created_at', '>=', now()->subDays(3))
+                ->avg('focus_level') ?? 0;
+                
+            if ($recentFocus < 60) {
+                $recommendations[] = "⚡ Mejora tu enfoque - intenta eliminar distracciones durante el trabajo.";
+            }
+
+            // Análisis de tareas pendientes
+            $pendingTasks = $user->tasks()->whereIn('status', ['pending', 'in_progress'])->count();
+            if ($pendingTasks > 10) {
+                $recommendations[] = "📋 Tienes {$pendingTasks} tareas pendientes - considera priorizar las más importantes.";
+            }
+
+            // Análisis de tareas vencidas
+            $overdueTasks = $user->tasks()->where('due_date', '<', Carbon::today())
+                ->whereNotIn('status', ['completed', 'cancelled'])
+                ->count();
+            if ($overdueTasks > 0) {
+                $recommendations[] = "⚠️ Tienes {$overdueTasks} tarea(s) vencida(s) - revísalas pronto.";
+            }
+        }
+
+        // Recomendación basada en consistencia
+        $consistency = $user->timeTrackings()
+            ->where('start_time', '>=', Carbon::now()->subDays(7))
+            ->selectRaw('COUNT(DISTINCT DATE(start_time)) as active_days')
+            ->first();
+
+        if ($consistency && $consistency->active_days < 3) {
+            $recommendations[] = "📅 Trabaja en establecer una rutina más consistente para mejores resultados.";
         }
 
         if (empty($recommendations)) {
-            $recommendations[] = "¡Buen trabajo! Mantén tu consistencia y enfoque actual.";
+            $recommendations[] = "🌟 ¡Excelente! Sigue trabajando para obtener recomendaciones más específicas.";
         }
 
-        return $recommendations;
+        return array_slice($recommendations, 0, 4); // Máximo 4 recomendaciones
+    }
+
+    /**
+     * Obtener conteo de tareas pendientes
+     */
+    private function getPendingTasksCount($user)
+    {
+        return $user->tasks()
+            ->whereIn('status', ['pending', 'in_progress'])
+            ->count();
+    }
+
+    /**
+     * Obtener tareas recientes
+     */
+    private function getRecentTasks($user)
+    {
+        return $user->tasks()
+            ->with('project')
+            ->whereIn('status', ['pending', 'in_progress'])
+            ->orderBy('priority', 'desc')
+            ->orderBy('due_date', 'asc')
+            ->take(5)
+            ->get();
+    }
+
+    /**
+     * Obtener estadísticas rápidas para el widget del sidebar
+     */
+    private function getQuickStats($user, $productivityMetrics)
+    {
+        return [
+            'today_productivity' => $productivityMetrics['today_productivity'] ?? 0,
+            'pending_tasks' => $this->getPendingTasksCount($user),
+            'current_session_minutes' => $productivityMetrics['current_session_minutes'] ?? 0,
+            'active_projects' => $user->projects()->where('status', 'active')->count(),
+        ];
     }
 }

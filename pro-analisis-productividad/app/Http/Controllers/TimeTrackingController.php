@@ -21,25 +21,27 @@ class TimeTrackingController extends Controller
     }
 
     public function create()
-    {
-        $projects = Auth::user()->projects()->where('status', 'active')->get();
-        
-        // Obtener categorías de actividad del usuario y del sistema
-        $categories = ActivityCategory::where(function($query) {
-            $query->where('user_id', Auth::id())
-                  ->orWhere('is_system', true);
-        })->get();
+{
+    $projects = Auth::user()->projects()->where('status', 'active')->get();
+    
+    // Obtener categorías de actividad del usuario y del sistema
+    $categories = ActivityCategory::where(function($query) {
+        $query->where('user_id', Auth::id())
+              ->orWhere('is_system', true);
+    })->get();
 
-        return view('time-trackings.create', compact('projects', 'categories'));
-    }
+    return view('time-trackings.create', compact('projects', 'categories'));
+}
 
     public function store(Request $request)
     {
         $validated = $request->validate([
             'project_id' => 'nullable|exists:projects,id',
             'activity_category_id' => 'required|exists:activity_categories,id',
-            'start_time' => 'required|date',
-            'end_time' => 'required|date|after:start_time',
+            'start_date' => 'required|date',
+            'start_time' => 'required|date_format:H:i',
+            'end_date' => 'required|date',
+            'end_time' => 'required|date_format:H:i',
             'description' => 'required|string|max:500',
             'focus_level' => 'nullable|integer|min:0|max:100',
             'energy_level' => 'nullable|integer|min:0|max:100',
@@ -47,9 +49,13 @@ class TimeTrackingController extends Controller
         ]);
 
         try {
+            // Combinar fecha y hora
+            $startDateTime = $validated['start_date'] . ' ' . $validated['start_time'];
+            $endDateTime = $validated['end_date'] . ' ' . $validated['end_time'];
+
             // Calcular duración en minutos
-            $start = new \DateTime($validated['start_time']);
-            $end = new \DateTime($validated['end_time']);
+            $start = new \DateTime($startDateTime);
+            $end = new \DateTime($endDateTime);
             $duration = $start->diff($end)->h * 60 + $start->diff($end)->i;
 
             // Crear el registro de tiempo
@@ -57,8 +63,8 @@ class TimeTrackingController extends Controller
                 'user_id' => Auth::id(),
                 'project_id' => $validated['project_id'],
                 'activity_category_id' => $validated['activity_category_id'],
-                'start_time' => $validated['start_time'],
-                'end_time' => $validated['end_time'],
+                'start_time' => $startDateTime,
+                'end_time' => $endDateTime,
                 'duration_minutes' => $duration,
                 'description' => $validated['description'],
                 'focus_level' => $validated['focus_level'] ?? 50,
@@ -94,12 +100,12 @@ class TimeTrackingController extends Controller
         $projects = Auth::user()->projects()->where('status', 'active')->get();
         
         // Obtener categorías de actividad del usuario y del sistema
-        $categories = ActivityCategory::where(function($query) {
+        $activityCategories = ActivityCategory::where(function($query) {
             $query->where('user_id', Auth::id())
                   ->orWhere('is_system', true);
         })->get();
 
-        return view('time-trackings.edit', compact('timeTracking', 'projects', 'categories'));
+        return view('time-trackings.edit', compact('timeTracking', 'projects', 'activityCategories'));
     }
 
     public function update(Request $request, TimeTracking $timeTracking)
@@ -109,54 +115,71 @@ class TimeTrackingController extends Controller
         $validated = $request->validate([
             'project_id' => 'nullable|exists:projects,id',
             'activity_category_id' => 'required|exists:activity_categories,id',
-            'start_time' => 'required|date',
-            'end_time' => 'required|date|after:start_time',
+            'start_date' => 'required|date',
+            'start_time' => 'required|date_format:H:i',
+            'end_date' => 'required|date',
+            'end_time' => 'required|date_format:H:i',
             'description' => 'required|string|max:500',
             'focus_level' => 'nullable|integer|min:0|max:100',
             'energy_level' => 'nullable|integer|min:0|max:100',
             'notes' => 'nullable|string|max:1000',
         ]);
 
-        // Calcular nueva duración
-        $start = new \DateTime($validated['start_time']);
-        $end = new \DateTime($validated['end_time']);
-        $newDuration = $start->diff($end)->h * 60 + $start->diff($end)->i;
+        try {
+            // Combinar fecha y hora
+            $startDateTime = $validated['start_date'] . ' ' . $validated['start_time'];
+            $endDateTime = $validated['end_date'] . ' ' . $validated['end_time'];
 
-        // Manejar cambios de proyecto y horas
-        $this->handleProjectHours($timeTracking, $validated['project_id'], $newDuration);
+            // Calcular nueva duración
+            $start = new \DateTime($startDateTime);
+            $end = new \DateTime($endDateTime);
+            $newDuration = $start->diff($end)->h * 60 + $start->diff($end)->i;
 
-        // Actualizar el registro
-        $timeTracking->update([
-            'project_id' => $validated['project_id'],
-            'activity_category_id' => $validated['activity_category_id'],
-            'start_time' => $validated['start_time'],
-            'end_time' => $validated['end_time'],
-            'duration_minutes' => $newDuration,
-            'description' => $validated['description'],
-            'focus_level' => $validated['focus_level'] ?? 50,
-            'energy_level' => $validated['energy_level'] ?? 50,
-            'notes' => $validated['notes'],
-        ]);
+            // Manejar cambios de proyecto y horas
+            $this->handleProjectHours($timeTracking, $validated['project_id'], $newDuration);
 
-        return redirect()->route('time-trackings.index')
-            ->with('success', 'Registro de tiempo actualizado exitosamente.');
+            // Actualizar el registro
+            $timeTracking->update([
+                'project_id' => $validated['project_id'],
+                'activity_category_id' => $validated['activity_category_id'],
+                'start_time' => $startDateTime,
+                'end_time' => $endDateTime,
+                'duration_minutes' => $newDuration,
+                'description' => $validated['description'],
+                'focus_level' => $validated['focus_level'] ?? 50,
+                'energy_level' => $validated['energy_level'] ?? 50,
+                'notes' => $validated['notes'],
+            ]);
+
+            return redirect()->route('time-trackings.index')
+                ->with('success', 'Registro de tiempo actualizado exitosamente.');
+
+        } catch (\Exception $e) {
+            return back()->with('error', 'Error al actualizar el registro: ' . $e->getMessage())
+                        ->withInput();
+        }
     }
 
     public function destroy(TimeTracking $timeTracking)
     {
         $this->authorize('delete', $timeTracking);
 
-        // Restar las horas del proyecto si existe
-        if ($timeTracking->project_id) {
-            $project = Project::find($timeTracking->project_id);
-            $project->total_hours -= $timeTracking->duration_minutes;
-            $project->save();
+        try {
+            // Restar las horas del proyecto si existe
+            if ($timeTracking->project_id) {
+                $project = Project::find($timeTracking->project_id);
+                $project->total_hours -= $timeTracking->duration_minutes;
+                $project->save();
+            }
+
+            $timeTracking->delete();
+
+            return redirect()->route('time-trackings.index')
+                ->with('success', 'Registro de tiempo eliminado exitosamente.');
+
+        } catch (\Exception $e) {
+            return back()->with('error', 'Error al eliminar el registro: ' . $e->getMessage());
         }
-
-        $timeTracking->delete();
-
-        return redirect()->route('time-trackings.index')
-            ->with('success', 'Registro de tiempo eliminado exitosamente.');
     }
 
     /**

@@ -19,6 +19,7 @@ class AuthServiceProvider extends ServiceProvider
     protected $policies = [
         TimeTracking::class => TimeTrackingPolicy::class,
         Project::class => ProjectPolicy::class,
+        Task::class => TaskPolicy::class,
     ];
 
     /**

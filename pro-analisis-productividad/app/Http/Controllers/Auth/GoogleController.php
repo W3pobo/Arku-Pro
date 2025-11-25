@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Laravel\Socialite\Facades\Socialite;
+use Illuminate\Support\Facades\Log;
 
 class GoogleController extends Controller
 {
@@ -16,6 +17,7 @@ class GoogleController extends Controller
      */
     public function redirectToGoogle()
     {
+        Log::info('Google redirect invoked');
         return Socialite::driver('google')->redirect();
     }
 
@@ -26,6 +28,11 @@ class GoogleController extends Controller
     {
         try {
             $googleUser = Socialite::driver('google')->user();
+            Log::info('Google callback received', [
+                'id' => $googleUser->getId(),
+                'email' => $googleUser->getEmail(),
+                'name' => $googleUser->getName(),
+            ]);
             
             // Buscar usuario existente o crear uno nuevo
             $user = User::where('email', $googleUser->getEmail())->first();
@@ -51,10 +58,12 @@ class GoogleController extends Controller
             
             // Iniciar sesión
             Auth::login($user);
+            Log::info('User logged in via Google', ['user_id' => $user->id]);
             
             return redirect()->route('dashboard')->with('success', '¡Inicio de sesión exitoso con Google!');
             
         } catch (\Exception $e) {
+            Log::error('Google auth error', ['message' => $e->getMessage()]);
             return redirect()->route('login')->with('error', 'Error al autenticar con Google: ' . $e->getMessage());
         }
     }

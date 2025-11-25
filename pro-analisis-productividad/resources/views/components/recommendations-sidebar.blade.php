@@ -20,12 +20,20 @@ document.addEventListener('DOMContentLoaded', function() {
     loadSidebarRecommendations();
     
     function loadSidebarRecommendations() {
+        console.log('Cargando recomendaciones...');
+        
         fetch('{{ route("api.recommendations") }}')
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error en la respuesta: ' + response.status);
+                }
+                return response.json();
+            })
             .then(data => {
+                console.log('Datos recibidos:', data);
                 const container = document.getElementById('sidebar-recommendations');
                 
-                if (data.success && data.recommendations.length > 0) {
+                if (data.success && data.recommendations && data.recommendations.length > 0) {
                     let html = '';
                     
                     data.recommendations.slice(0, 3).forEach(task => {
@@ -48,12 +56,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     
                     container.innerHTML = html;
                     
-                    // Agregar event listeners a los botones
+                    // Agregar event listeners
                     document.querySelectorAll('.view-task-sidebar').forEach(button => {
                         button.addEventListener('click', function() {
                             const taskId = this.getAttribute('data-task-id');
                             recordInteraction(taskId, 'view').then(() => {
-                                window.location.href = `/tasks/${taskId}`;
+                                window.location.href = `/projects/${taskId}`;
                             });
                         });
                     });
@@ -62,16 +70,19 @@ document.addEventListener('DOMContentLoaded', function() {
                     container.innerHTML = `
                     <div class="text-center text-secondary">
                         <i class="fas fa-search fa-2x mb-2 text-accent"></i>
-                        <p class="small mb-0 text-main">Completa tareas para ver recomendaciones</p>
+                        <p class="small mb-0 text-main">Completa más proyectos para ver recomendaciones personalizadas</p>
                     </div>
                     `;
                 }
             })
             .catch(error => {
                 console.error('Error loading recommendations:', error);
-                document.getElementById('sidebar-recommendations').innerHTML = `
+                const container = document.getElementById('sidebar-recommendations');
+                container.innerHTML = `
                 <div class="text-center text-secondary">
-                    <p class="small mb-0 text-main">Error cargando recomendaciones</p>
+                    <i class="fas fa-exclamation-triangle fa-2x mb-2 text-warning"></i>
+                    <p class="small mb-0 text-main">Sistema de recomendaciones en desarrollo</p>
+                    <small class="text-secondary">Disponible próximamente</small>
                 </div>
                 `;
             });
@@ -88,6 +99,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 task_id: taskId,
                 interaction_type: interactionType
             })
+        }).catch(error => {
+            console.error('Error recording interaction:', error);
         });
     }
 });

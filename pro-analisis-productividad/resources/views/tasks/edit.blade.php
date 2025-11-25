@@ -494,6 +494,7 @@
         padding: 0.75rem 1.5rem;
     }
     
+    
     .d-flex.justify-content-between {
         flex-direction: column;
         gap: 1rem;

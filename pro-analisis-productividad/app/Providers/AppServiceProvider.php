@@ -1,25 +1,21 @@
 <?php
-
+// app/Providers/AppServiceProvider.php
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use App\Services\TaskRecommenderService;
 
 class AppServiceProvider extends ServiceProvider
 {
-    /**
-     * Register any application services.
-     */
-    public function register(): void
+    public function register()
     {
-        //
+        $this->app->singleton(TaskRecommenderService::class, function ($app) {
+            return new TaskRecommenderService();
+        });
     }
 
-    /**
-     * Bootstrap any application services.
-     */
-    public function boot(): void
+    public function boot()
     {
-        // Este método debe estar VACÍO o solo con configuraciones de tu aplicación
-        // NO debe tener configureRateLimiting() ni configuración de rutas
+        //
     }
 }

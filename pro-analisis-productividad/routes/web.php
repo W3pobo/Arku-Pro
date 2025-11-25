@@ -16,6 +16,8 @@ use App\Http\Controllers\ActivityCategoryController;
 use App\Http\Controllers\ProductivityTagController;
 use App\Http\Controllers\RecommendationController;
 use App\Http\Controllers\TaskController;
+// AGREGADO: Importamos el controlador de IA
+use App\Http\Controllers\AIRecommendationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -47,7 +49,7 @@ Route::middleware('guest')->group(function () {
     Route::get('/auth/google', [GoogleController::class, 'redirectToGoogle'])->name('google.login');
     Route::get('/auth/google/callback', [GoogleController::class, 'callback']);
 
-    // Restablecimiento de contraseña - RUTAS NUEVAS
+    // Restablecimiento de contraseña
     Route::get('/forgot-password', [PasswordResetLinkController::class, 'create'])
         ->name('password.request');
     
@@ -63,7 +65,7 @@ Route::middleware('guest')->group(function () {
 
 // Rutas protegidas (requieren autenticación)
 Route::middleware('auth')->group(function () {
-    // Verificación de email - RUTAS NUEVAS
+    // Verificación de email
     Route::get('/email/verify', [VerificationController::class, 'show'])
         ->name('verification.notice');
     
@@ -100,8 +102,39 @@ Route::middleware('auth')->group(function () {
     Route::resource('activity-categories', ActivityCategoryController::class);
     Route::resource('productivity-tags', ProductivityTagController::class);
 
+    // Tareas
     Route::resource('tasks', TaskController::class);
     Route::post('/tasks/{task}/update-status', [TaskController::class, 'updateStatus'])->name('tasks.update-status');
+    
+    // ---------------------------------------------------------------------
+    // RUTAS DE RECOMENDACIONES E IA (MOVIDAS DESDE API.PHP)
+    // ---------------------------------------------------------------------
+    // Nota: Mantenemos el prefijo '/api/' en la URL para que el JavaScript
+    // del dashboard siga funcionando sin cambios, pero ahora usan sesión web.
+    
+    // Página de recomendaciones
+    Route::get('/recommendations', [RecommendationController::class, 'showRecommendationsPage'])
+        ->name('recommendations');
+    
+    // Endpoints consumidos por AJAX (Fetch) en el Dashboard
+    Route::get('/api/recommendations', [RecommendationController::class, 'getRecommendations'])
+        ->name('api.recommendations');
+    
+    Route::post('/api/record-interaction', [RecommendationController::class, 'recordInteraction'])
+        ->name('api.record_interaction');
+
+    // Endpoints de Inteligencia Artificial (IA)
+    Route::get('/api/ai/analysis', [AIRecommendationController::class, 'getAIAnalysis'])
+        ->name('api.ai.analysis');
+        
+    Route::get('/api/ai/insights', [AIRecommendationController::class, 'getAIInsights'])
+        ->name('api.ai.insights');
+        
+    Route::post('/api/ai/interaction', [AIRecommendationController::class, 'recordAIInteraction'])
+        ->name('api.ai.interaction');
+        
+    Route::get('/api/ai/recommendations', [AIRecommendationController::class, 'getAIRecommendations'])
+        ->name('api.ai.recommendations');
 
     // Cerrar sesión
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
@@ -110,15 +143,4 @@ Route::middleware('auth')->group(function () {
 // Ruta de fallback
 Route::fallback(function () {
     return redirect()->route('home');
-});
-
-Route::middleware(['auth'])->group(function () {
-    Route::get('/recommendations', [RecommendationController::class, 'showRecommendationsPage'])
-        ->name('recommendations');
-    
-    Route::get('/api/recommendations', [RecommendationController::class, 'getRecommendations'])
-        ->name('api.recommendations');
-    
-    Route::post('/api/interaction', [RecommendationController::class, 'recordInteraction'])
-        ->name('api.record_interaction');
 });

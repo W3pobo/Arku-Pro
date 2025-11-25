@@ -5,11 +5,9 @@
 @section('content')
 <div class="container-fluid py-4">
     <div class="row">
-        <!-- Contenido Principal -->
         <div class="col-lg-9 col-xl-10">
             <h1 class="mb-4 text-main">Dashboard de Productividad</h1>
             
-            <!-- Estadísticas Principales -->
             <div class="row mb-4">
                 @php
                     $statsCards = [
@@ -34,7 +32,6 @@
                 @endforeach
             </div>
 
-            <!-- Tareas Recientes -->
             <div class="card-custom mb-4">
                 <div class="card-header-custom d-flex justify-content-between align-items-center">
                     <h5 class="card-title-custom mb-0">Tareas Recientes</h5>
@@ -99,7 +96,6 @@
                 </div>
             </div>
 
-            <!-- Métricas de Productividad Avanzadas y Recomendaciones -->
             <div class="row mb-4">
                 <div class="col-lg-6 mb-4">
                     <div class="card-custom h-100">
@@ -164,7 +160,6 @@
                 </div>
             </div>
 
-            <!-- Distribución por Categorías -->
             <div class="card-custom mb-4">
                 <div class="card-header-custom">
                     <h5 class="card-title-custom mb-0">Distribución por Categorías</h5>
@@ -204,7 +199,6 @@
                 </div>
             </div>
             
-            <!-- Gráficos -->
             <div class="row mb-4">
                 <div class="col-lg-6 mb-4">
                     <div class="card-custom h-100">
@@ -229,7 +223,6 @@
                 </div>
             </div>
             
-            <!-- Actividad Reciente -->
             <div class="card-custom">
                 <div class="card-header-custom">
                     <h5 class="card-title-custom mb-0">Actividad Reciente</h5>
@@ -279,9 +272,7 @@
             </div>
         </div>
 
-        <!-- Sidebar de Recomendaciones con IA -->
         <div class="col-lg-3 col-xl-2">
-            <!-- Widget de IA -->
             <div class="card-custom mb-4">
                 <div class="card-header-custom">
                     <h6 class="card-title-custom mb-0">
@@ -320,9 +311,6 @@
                 </div>
             </div>
 
-            @include('components.recommendations-sidebar')
-            
-            <!-- Widget de Insights de IA -->
             <div class="card-custom mb-4">
                 <div class="card-header-custom">
                     <h6 class="card-title-custom mb-0">
